@@ -1,2 +1,6 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="Primitives/Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
+    <Project Path="Core/Nemonuri.Collections.Heterogeneous.Core.fsproj" />
+  </Folder>
 </Solution>
