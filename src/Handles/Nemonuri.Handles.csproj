@@ -6,27 +6,15 @@
     <Nullable>enable</Nullable>
     <LangVersion>14</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <RootNamespace>Nemonuri.Collections.Heterogeneous.Primitives</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Nemonuri.Handles</RootNamespace>
   </PropertyGroup>
 
   <Choose>
     <When Condition="$(TargetFramework.ToLowerInvariant().StartsWith('netstandard2.'))">
       <ItemGroup>
-        <PackageReference Include="PolySharp" PrivateAssets="all" Condition="false" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
       </ItemGroup>
-      <PropertyGroup>
-        <PolySharpIncludeGeneratedTypes>
-          System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
-          $(PolySharpIncludeGeneratedTypes)
-        </PolySharpIncludeGeneratedTypes>
-      </PropertyGroup>
     </When>
   </Choose>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Handles\Nemonuri.Handles.csproj" />
-  </ItemGroup>
-  
 </Project>

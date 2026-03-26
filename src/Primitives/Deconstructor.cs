@@ -2,17 +2,17 @@
 
 namespace Nemonuri.Collections.Heterogeneous.Primitives;
 
-public interface IDeconstructorPremise<TContext, TCollection>
+public interface IDeconstructorPremise<TConsCollection, THead, TTailContext, TTailCollection>
 {
-    (THead, TTail) Deconstruct<THead, TTail>(TCollection collection);
+    (THead, TTailCollection) Deconstruct(TConsCollection c);
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe readonly struct DeconstructorHandle<TCollection, THead, TTail>
+public unsafe readonly struct DeconstructorHandle<TConsCollection, THead, TTailContext, TTailCollection>
 {
-    private readonly delegate*<TCollection, (THead, TTail)> _fp;
+    private readonly delegate*<TConsCollection, (THead, TTailCollection)> _fp;
 
-    internal DeconstructorHandle(delegate*<TCollection, (THead, TTail)> fp)
+    internal DeconstructorHandle(delegate*<TConsCollection, (THead, TTailCollection)> fp)
     {
         _fp = fp;
     }
@@ -20,17 +20,37 @@ public unsafe readonly struct DeconstructorHandle<TCollection, THead, TTail>
     public nint ToIntPtr() => (nint)_fp;
 
     public bool HasValue => ToIntPtr() != 0;
+
+    public (THead, TTailCollection) Deconstruct(TConsCollection c) => _fp(c);
+
+    public BoxedDeconstructorHandle<TTailContext, TTailCollection> ToBoxedHandle() => new(ToIntPtr());
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection>
+{
+    private readonly nint _fp;
+
+    internal BoxedDeconstructorHandle(nint fp)
+    {
+        _fp = fp;
+    }
+
+    public nint ToIntPtr() => (nint)_fp;
+
+    public unsafe DeconstructorHandle<TConsCollection, THead, TContext, TContextedCollection> UnsafeToUnboxedHandle<TConsCollection, THead>() => 
+        new((delegate*<TConsCollection, (THead, TContextedCollection)>)ToIntPtr());
 }
 
 
 public static class DeconstructorTheory
 {
-    extension<TContext, TCollection, TPremise>(TPremise)
-        where TPremise : IDeconstructorPremise<TContext, TCollection>, new()
+    extension<TConsCollection, THead, TTailContext, TTailCollection, TPremise>(TPremise)
+        where TPremise : IDeconstructorPremise<TConsCollection, THead, TTailContext, TTailCollection>, new()
     {
-        public unsafe static DeconstructorHandle<TCollection, THead, TTail> ToHandle<THead, TTail>()
+        public unsafe static DeconstructorHandle<TConsCollection, THead, TTailContext, TTailCollection> ToHandle()
         {
-            static (THead, TTail) Impl(TCollection collection) => (new TPremise()).Deconstruct<THead, TTail>(collection);
+            static (THead, TTailCollection) Impl(TConsCollection c) => (new TPremise()).Deconstruct(c);
 
             return new(&Impl);
         }

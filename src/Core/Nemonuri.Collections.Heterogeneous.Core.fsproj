@@ -1,17 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>$(RepoTargetFrameworks)</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Nemonuri.Collections.Heterogeneous</RootNamespace>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="UntypedItem.fs" />
+    <Compile Include="HeterogeneousList.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
   </ItemGroup>
-
 </Project>

@@ -4,5 +4,7 @@
     <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(RepoRootPath)artifacts/</ArtifactsPath>
+
+    <RepoTargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</RepoTargetFrameworks>
   </PropertyGroup>
 </Project>
