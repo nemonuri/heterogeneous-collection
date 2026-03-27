@@ -1,9 +1,6 @@
-﻿namespace Nemonuri.Collections.Heterogeneous.HeterogeneousLists
+﻿namespace Nemonuri.Collections.Heterogeneous
 
-open Nemonuri.Handles
-open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
-
 
 [<NoEquality; NoComparison; Struct>]
 type internal HeterogeneousListItem = { TailDeconsHandle: nativeint; Item: UntypedItem }
@@ -12,6 +9,13 @@ type internal HeterogeneousListItem = { TailDeconsHandle: nativeint; Item: Untyp
 type HeterogeneousList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, HeterogeneousList<'TContext>>; Items: HeterogeneousListItem list }
 
 
+
+
+namespace Nemonuri.Collections.Heterogeneous.HeterogeneousLists
+
+open Nemonuri.Handles
+open Nemonuri.Collections.Heterogeneous
+open Nemonuri.Collections.Heterogeneous.Primitives
 
 module Operations =
 
