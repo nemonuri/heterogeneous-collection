@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Nemonuri.Handles;
 
 namespace Nemonuri.Collections.Heterogeneous.Primitives;
 
@@ -8,7 +9,7 @@ public interface IDeconstructorPremise<TConsCollection, THead, TTailContext, TTa
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe readonly struct DeconstructorHandle<TConsCollection, THead, TTailContext, TTailCollection>
+public unsafe readonly struct DeconstructorHandle<TConsCollection, THead, TTailContext, TTailCollection> : IHandle
 {
     private readonly delegate*<TConsCollection, (THead, TTailCollection)> _fp;
 
@@ -17,17 +18,15 @@ public unsafe readonly struct DeconstructorHandle<TConsCollection, THead, TTailC
         _fp = fp;
     }
 
+
+    /// <remarks>Default value is 0.</remarks>
     public nint ToIntPtr() => (nint)_fp;
 
-    public bool HasValue => ToIntPtr() != 0;
-
     public (THead, TTailCollection) Deconstruct(TConsCollection c) => _fp(c);
-
-    public BoxedDeconstructorHandle<TTailContext, TTailCollection> ToBoxedHandle() => new(ToIntPtr());
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection>
+public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection> : IHandle
 {
     private readonly nint _fp;
 
@@ -36,6 +35,7 @@ public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection>
         _fp = fp;
     }
 
+    /// <remarks>Default value is 0.</remarks>
     public nint ToIntPtr() => (nint)_fp;
 
     public unsafe DeconstructorHandle<TConsCollection, THead, TContext, TContextedCollection> UnsafeToUnboxedHandle<TConsCollection, THead>() => 

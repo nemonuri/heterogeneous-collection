@@ -11,7 +11,7 @@ type internal UntypedItem =
 module internal UntypedItems =
 
     let ofTyped (x: 'a) : UntypedItem =
-        if typeof<'a>.IsPrimitive then
+        if typeof<'a>.IsPrimitive && sizeof<'a> <= sizeof<int64> then
             let mutable v : int64 = 0L
             Unsafe.WriteUnaligned(&Unsafe.As<_,_>(&v), x)
             v |> UntypedItem.Primitive

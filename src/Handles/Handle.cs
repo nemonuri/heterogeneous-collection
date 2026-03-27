@@ -10,10 +10,15 @@ public interface IHandle
 
 public static class HandleTheory
 {
+    public static bool CheckHasValue(nint intPtr)
+    {
+        return intPtr != 0;
+    }
+
     public static bool CheckHasValue(IHandle? handle)
     {
         if (handle is null) { return false; }
-        return handle.ToIntPtr() != 0;
+        return CheckHasValue(handle.ToIntPtr());
     }
 
     public static bool Equals(IHandle? left, IHandle? right)
