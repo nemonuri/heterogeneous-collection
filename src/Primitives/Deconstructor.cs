@@ -42,7 +42,6 @@ public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection> 
         new((delegate*<TContextedCollection, (THead, TTailCollection)>)ToIntPtr());
 }
 
-
 public static class DeconstructorTheory
 {
     extension<TConsCollection, THead, TTailContext, TTailCollection, TPremise>(TPremise)

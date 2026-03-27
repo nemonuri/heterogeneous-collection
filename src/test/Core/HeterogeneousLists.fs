@@ -57,3 +57,18 @@ let ``consAndDecons2 is identity - Test3``() =
 let ``consAndDecons2 is identity - Test4``() =
     let xs = "One", "Two" in
     Assert.Equal(xs, consAndDecons2 xs)
+
+let private consAndDecons3 (x1: 'a1, x2: 'a2, x3: 'a3) =
+    let l = empty |> cons x1 |> cons x2 |> cons x3 in
+    match decons l with
+    | r3, l ->
+    match decons l with
+    | r2, l -> 
+    match decons l with
+    | r1, _ -> r1, r2, r3
+
+[<Fact>]
+let ``consAndDecons3 is identity``() =
+    let xs = 5.6, struct ("Hello", Some "World"), Ok '6' in
+    Assert.Equal(xs, consAndDecons3 xs)
+
