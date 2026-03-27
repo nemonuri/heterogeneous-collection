@@ -2,8 +2,7 @@ module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
 
 open Xunit
 open Nemonuri.Collections.Heterogeneous
-open Nemonuri.Collections.Heterogeneous.HeterogeneousLists
-open Nemonuri.Collections.Heterogeneous.HeterogeneousLists.Operations
+open Nemonuri.Collections.Heterogeneous.QuickLists
 
 [<Fact>]
 let ``(length empty) is 0``() =
@@ -86,5 +85,5 @@ let private stringFolder =
 let ``foldQuick and stringFolder works expected``() =
     let l = empty |> cons 1 |> cons "Haha" |> cons true |> cons (System.Object())
     let expected = "System.Object True Haha 1"
-    let actual = Folders.foldQuick stringFolder "" l
+    let actual = Folders.fold stringFolder "" l
     Assert.Equal(expected, actual)

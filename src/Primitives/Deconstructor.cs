@@ -3,9 +3,9 @@ using Nemonuri.Handles;
 
 namespace Nemonuri.Collections.Heterogeneous.Primitives;
 
-public interface IDeconstructorPremise<TConsCollection, THead, TTailContext, TTailCollection>
+public interface IDeconstructorPremise<TConsCollection, THeadContext, TTailContext, TTailCollection>
 {
-    (THead, TTailCollection) Deconstruct(TConsCollection c);
+    (THeadContext, TTailCollection) Deconstruct(TConsCollection c);
 }
 
 [StructLayout(LayoutKind.Sequential)]

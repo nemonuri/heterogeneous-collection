@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="HeterogeneousLists.fs" /><Compile Include="HeterogeneousLists.Folder.fs" />
+    <Compile Include="QuickLists.fs" /><Compile Include="QuickTypeLists.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
