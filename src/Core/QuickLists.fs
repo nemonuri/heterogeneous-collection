@@ -65,22 +65,22 @@ module QuickLists = begin
 
         let (|FoldEntryV|) entry = ofFoldEntryV entry
 
-        let finishFold<'state> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<unit>)) : 'state = acc
+        let finish<'state> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<unit>)) : 'state = acc
 
-        let foldOnce<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<'hd -> 'tl>)) =
-            match decons l with
-            | hd, tl ->
+        let step<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<'hd -> 'tl>)) =
+            match deconsV l with
+            | struct ( hd, tl ) ->
                 let state = folder.Fold acc hd
                 toFoldEntry folder state tl
 
-        let inline internal ( ! ) entry = foldOnce entry
+        let inline internal ( ! ) entry = step entry
         
         [<NoEquality; NoComparison>]
         type Premise = struct
 
-            static member Fold e = e |> finishFold 
+            static member Fold e = e |> finish 
 
-            static member Fold e = !e |> finishFold
+            static member Fold e = !e |> finish
 
         end
 
@@ -92,35 +92,35 @@ module QuickLists = begin
 
         type Premise with
 
-            static member Fold e = ! !e |> finishFold
+            static member Fold e = ! !e |> finish
 
-            static member Fold e = ! ! !e |> finishFold
+            static member Fold e = ! ! !e |> finish
 
-            static member Fold e = ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finish
 
-            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+            static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finish
 
         end
 
