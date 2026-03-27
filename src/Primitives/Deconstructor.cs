@@ -38,8 +38,8 @@ public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection> 
     /// <remarks>Default value is 0.</remarks>
     public nint ToIntPtr() => (nint)_fp;
 
-    public unsafe DeconstructorHandle<TConsCollection, THead, TContext, TContextedCollection> UnsafeToUnboxedHandle<TConsCollection, THead>() => 
-        new((delegate*<TConsCollection, (THead, TContextedCollection)>)ToIntPtr());
+    public unsafe DeconstructorHandle<TContextedCollection, THead, TTailContext, TTailCollection> UnsafeToUnboxedHandle<THead, TTailContext, TTailCollection>() => 
+        new((delegate*<TContextedCollection, (THead, TTailCollection)>)ToIntPtr());
 }
 
 

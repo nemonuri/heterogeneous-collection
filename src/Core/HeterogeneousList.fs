@@ -41,7 +41,7 @@ module HeterogeneousLists =
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
     let decons (l: HeterogeneousList<'hd -> 'tl>) =
-        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<HeterogeneousList<'hd -> 'tl>, 'hd>()
+        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'tl,HeterogeneousList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         hd, tlc
 
