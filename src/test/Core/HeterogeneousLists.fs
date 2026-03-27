@@ -1,0 +1,59 @@
+module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
+
+open Xunit
+open Nemonuri.Collections.Heterogeneous.HeterogeneousLists
+
+[<Fact>]
+let ``(length empty) is 0``() =
+    let actual = (length empty)
+    Assert.Equal(0, actual)
+
+[<Fact>]
+let ``empty is empty``() =
+    let actual = empty |> isEmpty
+    Assert.True(actual)
+
+let private consAndDecons (x: 'a) =
+    empty |> cons x |> decons |> fst
+
+[<Fact>]
+let ``consAndDecons is identity - Test1``() =
+    let x = 1
+    Assert.Equal(x, consAndDecons x)
+
+[<Fact>]
+let ``consAndDecons is identity - Test2``() =
+    let x = "Hello!"
+    Assert.Equal(x, consAndDecons x)
+
+[<Fact>]
+let ``consAndDecons is identity - Test3``() =
+    let x = {| Name ="John"; Age = 23; Rate = 9.34 |}
+    Assert.Equal(x, consAndDecons x)
+
+let private consAndDecons2 (x1: 'a1, x2: 'a2) =
+    let l = empty |> cons x1 |> cons x2 in
+    match decons l with
+    | r2, l ->
+    match decons l with
+    | r1, _ -> r1, r2
+
+[<Fact>]
+let ``consAndDecons2 is identity - Test1``() =
+    let xs = 1, 2 in
+    Assert.Equal(xs, consAndDecons2 xs)
+
+[<Fact>]
+let ``consAndDecons2 is identity - Test2``() =
+    let xs = 1, "Two" in
+    Assert.Equal(xs, consAndDecons2 xs)
+
+[<Fact>]
+let ``consAndDecons2 is identity - Test3``() =
+    let xs = "One", 2 in
+    Assert.Equal(xs, consAndDecons2 xs)
+
+[<Fact>]
+let ``consAndDecons2 is identity - Test4``() =
+    let xs = "One", "Two" in
+    Assert.Equal(xs, consAndDecons2 xs)

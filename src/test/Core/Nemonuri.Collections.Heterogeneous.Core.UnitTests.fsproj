@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="UnitTest1.fs" />
+    <Compile Include="HeterogeneousLists.fs" />
   </ItemGroup>
 
   <ItemGroup>
