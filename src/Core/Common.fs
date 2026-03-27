@@ -1,5 +1,6 @@
 namespace Nemonuri.Collections.Heterogeneous
 
+open System
 open System.Runtime.CompilerServices
 
 type IFolder<'TState> = interface
@@ -14,7 +15,7 @@ type internal UntypedItem =
 | Primitive of p: int64
 | Object of o: obj
 
-module internal UntypedItems =
+module internal UntypedItems = begin
 
     let ofTyped (x: 'a) : UntypedItem =
         if typeof<'a>.IsPrimitive && sizeof<'a> <= sizeof<int64> then
@@ -30,3 +31,26 @@ module internal UntypedItems =
             let mutable v = p
             Unsafe.ReadUnaligned<'a>(&Unsafe.As<_,_>(&v))
         | UntypedItem.Object o -> unbox o
+
+end
+
+
+[<RequireQualifiedAccess>]
+[<Struct>]
+type TypeHandle<'TType> = internal { InnerValue: RuntimeTypeHandle } with
+
+    member x.Value = x.InnerValue
+
+end
+
+module TypeHandles = begin
+
+    let ofType<'T> : TypeHandle<'T> = { InnerValue = typeof<'T>.TypeHandle }
+
+    let tryToTypedV<'T> (rth: RuntimeTypeHandle) : voption<TypeHandle<'T>> = 
+        if typeof<'T>.TypeHandle = rth then
+            { TypeHandle.InnerValue = rth } |> ValueSome
+        else
+            ValueNone
+
+end

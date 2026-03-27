@@ -8,7 +8,6 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 type internal QuickListItem = { TailDeconsHandle: nativeint; Item: UntypedItem }
 
 [<RequireQualifiedAccess>]
-[<CompiledName("QuickHeterogeneousList`1")>]
 [<NoEquality; NoComparison; Struct>]
 type QuickList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickList<'TContext>>; Items: QuickListItem list }
 
@@ -23,9 +22,9 @@ module QuickLists = begin
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
 
-        static member ToHandle() = DeconstructorTheory.ToHandle<QuickList<'hd -> 'tl>, 'hd, 'tl, QuickList<'tl>, Deconstructor<'hd,'tl>>()
+        static member ToHandle() = DeconstructorTheory.ToHandle<QuickList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickList<'tl>, Deconstructor<'hd,'tl>>()
 
-        interface IDeconstructorPremise<QuickList<'hd -> 'tl>, 'hd, 'tl, QuickList<'tl>> with
+        interface IDeconstructorPremise<QuickList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickList<'tl>> with
             member _.Deconstruct (c: QuickList<'hd -> 'tl>): struct ('hd * QuickList<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
@@ -42,7 +41,7 @@ module QuickLists = begin
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
     let deconsV (l: QuickList<'hd -> 'tl>) =
-        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'tl,QuickList<'tl>>()
+        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         struct (hd, tlc)
 
