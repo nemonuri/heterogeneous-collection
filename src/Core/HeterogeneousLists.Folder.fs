@@ -26,7 +26,7 @@ module Folders =
     let inline internal ( ! ) entry = foldOnce entry
     
     [<NoEquality; NoComparison>]
-    type Premise = struct
+    type QuickPremise = struct
 
         static member Fold e = e |> finishFold 
 
@@ -34,13 +34,13 @@ module Folders =
 
     end
 
-    let inline fold folder (seed: 'state) l =
+    let inline foldQuick folder (seed: 'state) l =
         let inline call (p: ^p) (s: ^s) (e: ^e) = ((^p or ^s) : (static member Fold: _ -> _) e)
         let entry = toFoldEntry folder seed l
-        let result: 'state = call Unchecked.defaultof<Premise> seed entry
+        let result: 'state = call Unchecked.defaultof<QuickPremise> seed entry
         result
 
-    type Premise with
+    type QuickPremise with
 
         static member Fold e = ! !e |> finishFold
 

@@ -83,8 +83,8 @@ let private stringFolder =
                 str + " " + (elem |> box |> _.ToString()) }
 
 [<Fact>]
-let ``fold and stringFolder works expected``() =
+let ``foldQuick and stringFolder works expected``() =
     let l = empty |> cons 1 |> cons "Haha" |> cons true |> cons (System.Object())
     let expected = "System.Object True Haha 1"
-    let actual = Folders.fold stringFolder "" l
+    let actual = Folders.foldQuick stringFolder "" l
     Assert.Equal(expected, actual)
