@@ -45,3 +45,6 @@ module HeterogeneousLists =
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         hd, tlc
 
+    let length (l: HeterogeneousList<'ctx>) = l.Items |> List.length
+
+    let isEmpty l = (length l) = 0

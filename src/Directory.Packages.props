@@ -8,6 +8,9 @@
   <ItemGroup>
     <PackageVersion Include="PolySharp" Version="1.15.0" />
     <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.4.1" />
+    <PackageVersion Include="FSharp.Core" Version="10.0.100" />
   </ItemGroup>
   
 </Project>
