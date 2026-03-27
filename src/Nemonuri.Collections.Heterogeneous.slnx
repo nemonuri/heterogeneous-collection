@@ -4,4 +4,7 @@
     <Project Path="Core/Nemonuri.Collections.Heterogeneous.Core.fsproj" />
     <Project Path="Handles/Nemonuri.Handles.csproj" />
   </Folder>
+  <Folder Name="/test/" >
+    <Project Path="test/Core/Nemonuri.Collections.Heterogeneous.Core.UnitTests.fsproj" />
+  </Folder>
 </Solution>

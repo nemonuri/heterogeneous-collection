@@ -20,4 +20,8 @@
     <PackageReference Include="FSharp.Core" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Nemonuri.Collections.Heterogeneous.Core.fsproj" />
+  </ItemGroup>
+
 </Project>
