@@ -1,6 +1,5 @@
 namespace Nemonuri.Collections.Heterogeneous.HeterogeneousLists
 
-open type System.TupleExtensions
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.HeterogeneousLists.Operations
 
