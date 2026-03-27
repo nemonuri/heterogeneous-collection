@@ -23,10 +23,12 @@ public unsafe readonly struct DeconstructorHandle<TConsCollection, THead, TTailC
     public nint ToIntPtr() => (nint)_fp;
 
     public (THead, TTailCollection) Deconstruct(TConsCollection c) => _fp(c);
+
+    public BoxedDeconstructorHandle<TConsContext, TConsCollection> ToBoxedHandle<TConsContext>() => new(ToIntPtr());
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection> : IHandle
+public readonly struct BoxedDeconstructorHandle<TContext, TCollection> : IHandle
 {
     private readonly nint _fp;
 
@@ -38,8 +40,8 @@ public readonly struct BoxedDeconstructorHandle<TContext, TContextedCollection> 
     /// <remarks>Default value is 0.</remarks>
     public nint ToIntPtr() => (nint)_fp;
 
-    public unsafe DeconstructorHandle<TContextedCollection, THead, TTailContext, TTailCollection> UnsafeToUnboxedHandle<THead, TTailContext, TTailCollection>() => 
-        new((delegate*<TContextedCollection, (THead, TTailCollection)>)ToIntPtr());
+    public unsafe DeconstructorHandle<TCollection, THead, TTailContext, TTailCollection> UnsafeToUnboxedHandle<THead, TTailContext, TTailCollection>() => 
+        new((delegate*<TCollection, (THead, TTailCollection)>)ToIntPtr());
 }
 
 public static class DeconstructorTheory

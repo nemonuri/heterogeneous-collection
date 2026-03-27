@@ -12,10 +12,7 @@ type HeterogeneousList<'TContext> = internal { DeconsHandle: BoxedDeconstructorH
 
 module HeterogeneousLists =
 
-    type private Decons<'hd,'tl> = DeconstructorHandle<HeterogeneousList<'hd -> 'tl>, 'hd, 'tl, HeterogeneousList<'tl>>
-    type private Boxed<'ctx> = BoxedDeconstructorHandle<'ctx, HeterogeneousList<'ctx>>
-
-    let empty : HeterogeneousList<unit> = { DeconsHandle = Boxed<unit>() ; Items = [] }
+    let empty : HeterogeneousList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
 
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
@@ -33,11 +30,9 @@ module HeterogeneousLists =
 
     end
 
-    let private deconsToBoxed (dch: Decons<'hd,'tl>) : Boxed<'hd -> 'tl> = HandleTheory.UnsafeAsHandle<_>(dch.ToIntPtr())
-
     let cons (hd: 'hd) (tl: HeterogeneousList<'tl>) : HeterogeneousList<'hd -> 'tl> =
         let hdItem = { TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); Item = UntypedItems.ofTyped hd }
-        let deconsHandle = Deconstructor<'hd,'tl>.ToHandle() |> deconsToBoxed
+        let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
     let decons (l: HeterogeneousList<'hd -> 'tl>) =
