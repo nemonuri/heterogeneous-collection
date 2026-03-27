@@ -2,6 +2,12 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open System.Runtime.CompilerServices
 
+type IFolder<'TState> = interface
+
+    abstract member Fold<'T> : 'TState -> 'T -> 'TState
+
+end
+
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
 type internal UntypedItem =

@@ -1,6 +1,7 @@
-﻿namespace Nemonuri.Collections.Heterogeneous
+﻿namespace Nemonuri.Collections.Heterogeneous.HeterogeneousLists
 
 open Nemonuri.Handles
+open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
 
 
@@ -10,13 +11,9 @@ type internal HeterogeneousListItem = { TailDeconsHandle: nativeint; Item: Untyp
 [<NoEquality; NoComparison; Struct>]
 type HeterogeneousList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, HeterogeneousList<'TContext>>; Items: HeterogeneousListItem list }
 
-type IFolder<'TState> = interface
 
-    abstract member Fold<'T> : 'TState -> 'T -> 'TState
 
-end
-
-module HeterogeneousLists =
+module Operations =
 
     let empty : HeterogeneousList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
 
@@ -41,17 +38,15 @@ module HeterogeneousLists =
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
-    let decons (l: HeterogeneousList<'hd -> 'tl>) =
+    let deconsV (l: HeterogeneousList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'tl,HeterogeneousList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
-        hd, tlc
+        struct (hd, tlc)
+
+    let decons l =
+        match deconsV l with | struct (hd, tl) -> hd, tl
 
     let length (l: HeterogeneousList<'ctx>) = l.Items |> List.length
 
     let isEmpty l = (length l) = 0
 
-    let foldOnce<'state, 'hd, 'tl> (folder: IFolder<'state>) (acc: 'state) (l: HeterogeneousList<'hd -> 'tl>) : ('state * HeterogeneousList<'tl>) =
-        match decons l with
-        | hd, tl ->
-            let state = folder.Fold acc hd
-            state, tl
