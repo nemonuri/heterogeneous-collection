@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="HeterogeneousLists.fs" />
+    <Compile Include="QuickLists.fs" /><Compile Include="QuickUnions.fs" />
   </ItemGroup>
 
   <ItemGroup>

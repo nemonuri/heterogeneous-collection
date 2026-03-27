@@ -1,4 +1,4 @@
-module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
+module Nemonuri.Collections.Heterogeneous.UnitTests.QuickLists
 
 open Xunit
 open Nemonuri.Collections.Heterogeneous
@@ -82,7 +82,7 @@ let private stringFolder =
                 str + " " + (elem |> box |> _.ToString()) }
 
 [<Fact>]
-let ``foldQuick and stringFolder works expected``() =
+let ``fold and stringFolder works expected``() =
     let l = empty |> cons 1 |> cons "Haha" |> cons true |> cons (System.Object())
     let expected = "System.Object True Haha 1"
     let actual = Folders.fold stringFolder "" l
