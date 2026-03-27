@@ -23,7 +23,7 @@ module Folders =
             let state = folder.Fold acc hd
             toFoldEntry folder state tl
 
-    let inline private ( ! ) entry = foldOnce entry
+    let inline internal ( ! ) entry = foldOnce entry
     
     [<NoEquality; NoComparison>]
     type Premise = struct
@@ -31,6 +31,16 @@ module Folders =
         static member Fold e = e |> finishFold 
 
         static member Fold e = !e |> finishFold
+
+    end
+
+    let inline fold folder (seed: 'state) l =
+        let inline call (p: ^p) (s: ^s) (e: ^e) = ((^p or ^s) : (static member Fold: _ -> _) e)
+        let entry = toFoldEntry folder seed l
+        let result: 'state = call Unchecked.defaultof<Premise> seed entry
+        result
+
+    type Premise with
 
         static member Fold e = ! !e |> finishFold
 
@@ -50,10 +60,16 @@ module Folders =
 
         static member Fold e = ! ! ! ! ! ! ! ! ! !e |> finishFold
 
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
+        static member Fold e = ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !e |> finishFold
+
     end
-
-    let inline fold folder seed l =
-        let inline call (p: ^p) (s: ^s) (e: ^e) = ((^p or ^s) : (static member Fold: _ -> _) e)
-        let entry = toFoldEntry folder seed l
-        call Unchecked.defaultof<Premise> seed entry
-

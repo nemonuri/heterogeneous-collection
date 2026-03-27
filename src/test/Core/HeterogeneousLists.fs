@@ -1,7 +1,9 @@
 module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
 
 open Xunit
+open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.HeterogeneousLists
+open Nemonuri.Collections.Heterogeneous.HeterogeneousLists.Operations
 
 [<Fact>]
 let ``(length empty) is 0``() =
@@ -72,3 +74,17 @@ let ``consAndDecons3 is identity``() =
     let xs = 5.6, struct ("Hello", Some "World"), Ok '6' in
     Assert.Equal(xs, consAndDecons3 xs)
 
+let private stringFolder = 
+    { new IFolder<string> with 
+        member _.Fold (str: string) (elem: 'T): string = 
+            if str.Length = 0 then 
+                str + (elem |> box |> _.ToString())
+            else
+                str + " " + (elem |> box |> _.ToString()) }
+
+[<Fact>]
+let ``fold and stringFolder works expected``() =
+    let l = empty |> cons 1 |> cons "Haha" |> cons true |> cons (System.Object())
+    let expected = "System.Object True Haha 1"
+    let actual = Folders.fold stringFolder "" l
+    Assert.Equal(expected, actual)
