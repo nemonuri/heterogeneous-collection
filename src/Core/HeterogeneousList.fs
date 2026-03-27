@@ -10,6 +10,12 @@ type internal HeterogeneousListItem = { TailDeconsHandle: nativeint; Item: Untyp
 [<NoEquality; NoComparison; Struct>]
 type HeterogeneousList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, HeterogeneousList<'TContext>>; Items: HeterogeneousListItem list }
 
+type IFolder<'TState> = interface
+
+    abstract member Fold<'T> : 'TState -> 'T -> 'TState
+
+end
+
 module HeterogeneousLists =
 
     let empty : HeterogeneousList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
@@ -43,3 +49,9 @@ module HeterogeneousLists =
     let length (l: HeterogeneousList<'ctx>) = l.Items |> List.length
 
     let isEmpty l = (length l) = 0
+
+    let foldOnce<'state, 'hd, 'tl> (folder: IFolder<'state>) (acc: 'state) (l: HeterogeneousList<'hd -> 'tl>) : ('state * HeterogeneousList<'tl>) =
+        match decons l with
+        | hd, tl ->
+            let state = folder.Fold acc hd
+            state, tl
