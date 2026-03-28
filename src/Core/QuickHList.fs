@@ -52,10 +52,10 @@ module QuickHLists = begin
 
         static member Instance = NullAcceptor()
 
-        member _.Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
+        static member Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
         
         interface IFolderAcceptor<QuickHList<unit>> with
-            member x.Accept (folder, acc, elem) = x.Accept(folder, acc, elem)
+            member _.Accept (folder, acc, elem) = NullAcceptor.Accept(folder, acc, elem)
 
     end
 
@@ -70,13 +70,13 @@ module QuickHLists = begin
 
         static member Instance = ConsAcceptor<'hd,'tl>()
 
-        member _.Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
+        static member Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
             let struct (hd, tl ) = deconsV elem in
             let nextAcc = folder.Step(acc, hd) in
             visit folder nextAcc tl
         
         interface IFolderAcceptor<QuickHList<'hd->'tl>> with
-            member x.Accept (folder, acc, elem) = x.Accept(folder, acc, elem)
+            member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
 
     end
 
