@@ -3,9 +3,6 @@
     <Project Path="benchmark/HList.ConsOnly/HList.ConsOnly.fsproj" />
     <Project Path="benchmark/HList/HList.fsproj" />
   </Folder>
-  <Folder Name="/NetStandards/">
-    <Project Path="NetStandards/Nemonuri.NetStandards.IsReadOnly.csproj" />
-  </Folder>
   <Folder Name="/src/">
     <Project Path="Primitives/Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
     <Project Path="Core/Nemonuri.Collections.Heterogeneous.Core.fsproj" />

@@ -11,12 +11,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
   </ItemGroup>
-
-  <Choose>
-    <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
-      <ItemGroup>
-        <ProjectReference Include="..\NetStandards\Nemonuri.NetStandards.IsReadOnly.csproj" />
-      </ItemGroup>
-    </When>
-  </Choose>
 </Project>
