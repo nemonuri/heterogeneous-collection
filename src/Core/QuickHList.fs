@@ -5,11 +5,11 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderAcceptor; Item: UntypedItem; }
+type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IOptimizedFolderAcceptor; Item: UntypedItem; }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderAcceptor<QuickHList<'TContext>>; Items: QuickHListItem list }
+type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IOptimizedFolderAcceptor; Items: QuickHListItem list }
 
 
 module QuickHLists = begin
@@ -31,7 +31,7 @@ module QuickHLists = begin
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
-                            L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
+                            L.Acceptor = tailAcceptor; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }
                     struct ( hd, tl )
@@ -54,8 +54,10 @@ module QuickHLists = begin
 
         static member Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
         
-        interface IFolderAcceptor<QuickHList<unit>> with
-            member _.Accept (folder, acc, elem) = NullAcceptor.Accept(folder, acc, elem)
+        interface IOptimizedFolderAcceptor with
+            member _.Accept (folder, acc, elem: 'b) = 
+                if typeof<'b> <> typeof<QuickHList<unit>> then failwith "Unreachable" else
+                NullAcceptor.Accept(folder, acc, unbox elem)
 
     end
 
@@ -75,8 +77,10 @@ module QuickHLists = begin
             let nextAcc = folder.Step(acc, hd) in
             visit folder nextAcc tl
         
-        interface IFolderAcceptor<QuickHList<'hd->'tl>> with
-            member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
+        interface IOptimizedFolderAcceptor with
+            member _.Accept (folder, acc, elem: 'b) = 
+                if typeof<'b> <> typeof<QuickHList<'hd->'tl>> then failwith "Unreachable" else
+                ConsAcceptor<'hd,'tl>.Accept(folder, acc, unbox elem)
 
     end
 

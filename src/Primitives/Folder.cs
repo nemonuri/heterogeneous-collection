@@ -22,6 +22,12 @@ public interface IFolderAcceptor<T> : IFolderAcceptor
 }
 
 
+public interface IOptimizedFolderAcceptor
+{
+    TState Accept<TState, T>(IFolder<TState> folder, TState acc, T elem);
+}
+
+
 public static class FolderTheory
 {
     public static bool TrySpecialize<TContext>
