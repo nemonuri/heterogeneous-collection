@@ -10,6 +10,6 @@ BenchmarkDotNet v0.15.8, Windows 10 (10.0.19045.6466/22H2/2022Update)
 ```
 | Method       | Mean     | Error   | StdDev  | Ratio | Exceptions | Gen0   | Allocated | Alloc Ratio |
 |------------- |---------:|--------:|--------:|------:|-----------:|-------:|----------:|------------:|
-| HList        | 353.8 ns | 2.68 ns | 2.51 ns |  1.00 |          - | 0.0958 |    1504 B |        1.00 |
-| MinimalHList | 156.2 ns | 0.70 ns | 0.58 ns |  0.44 |          - | 0.0284 |     448 B |        0.30 |
-| QuickHLists  | 348.2 ns | 1.85 ns | 1.73 ns |  0.98 |          - | 0.0448 |     704 B |        0.47 |
+| HList        | 344.9 ns | 2.36 ns | 2.09 ns |  1.00 |          - | 0.0958 |    1504 B |        1.00 |
+| MinimalHList | 152.3 ns | 1.11 ns | 0.99 ns |  0.44 |          - | 0.0284 |     448 B |        0.30 |
+| QuickHLists  | 451.9 ns | 3.38 ns | 3.16 ns |  1.31 |          - | 0.0448 |     704 B |        0.47 |
