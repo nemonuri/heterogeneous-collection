@@ -5,11 +5,11 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickHListItem = { TailDeconsHandle: nativeint; TailVisitable: IFolderVisitable; Item: UntypedItem; }
+type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderAcceptor; Item: UntypedItem; }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Visitable: IFolderVisitable<'TContext>; Items: QuickHListItem list }
+type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderAcceptor<QuickHList<'TContext>>; Items: QuickHListItem list }
 
 
 module QuickHLists = begin
@@ -26,12 +26,12 @@ module QuickHLists = begin
             member _.Deconstruct (c: QuickHList<'hd -> 'tl>): struct ('hd * QuickHList<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
-                | { TailDeconsHandle = tlHandle; Item = hdItem; TailVisitable = tailVisitable }::tlItems -> 
+                | { TailDeconsHandle = tlHandle; Item = hdItem; TailAcceptor = tailAcceptor }::tlItems -> 
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
-                            L.Visitable = Folders.specializeVisitable<_> tailVisitable; 
+                            L.Acceptor = Folders.specializeAcceptor<_> tailAcceptor; 
                             L.Items = tlItems 
                         }
                     struct ( hd, tl )
@@ -53,21 +53,16 @@ module QuickHLists = begin
         static member Instance = NullAcceptor()
 
         member _.Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
-
-        interface IFolderVisitable<unit> with
-            member x.Acceptor = x
         
         interface IFolderAcceptor<QuickHList<unit>> with
             member x.Accept (folder, acc, elem) = x.Accept(folder, acc, elem)
 
     end
 
-    let empty : QuickHList<unit> = { DeconsHandle = Unchecked.defaultof<_>; Visitable = NullAcceptor.Instance; Items = [] }
+    let empty : QuickHList<unit> = { DeconsHandle = Unchecked.defaultof<_>; Acceptor = NullAcceptor.Instance; Items = [] }
 
     let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
-        l.Visitable.Acceptor
-        |> Folders.specializeAcceptor<QuickHList<'ctx>> 
-        |> _.Accept(folder, acc, l)
+        l.Acceptor.Accept(folder, acc, l)
 
     type private ConsAcceptor<'hd,'tl> = class
 
@@ -79,9 +74,6 @@ module QuickHLists = begin
             let struct (hd, tl ) = deconsV elem in
             let nextAcc = folder.Step(acc, hd) in
             visit folder nextAcc tl
-
-        interface IFolderVisitable<'hd->'tl> with
-            member x.Acceptor = x
         
         interface IFolderAcceptor<QuickHList<'hd->'tl>> with
             member x.Accept (folder, acc, elem) = x.Accept(folder, acc, elem)
@@ -92,13 +84,13 @@ module QuickHLists = begin
         let hdItem = 
             { 
                 I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); 
-                I.TailVisitable = tl.Visitable;
+                I.TailAcceptor = tl.Acceptor;
                 I.Item = UntypedItems.ofTyped hd
             }
         in
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>() in
         let visitable = ConsAcceptor<'hd,'tl>.Instance in
-        { DeconsHandle = deconsHandle; Visitable = visitable; Items = hdItem::tl.Items }
+        { DeconsHandle = deconsHandle; Acceptor = visitable; Items = hdItem::tl.Items }
 
     (* fold is starter of visit. *)
     let fold (folder: IFolder<'state>) (seed: 'state) (l: QuickHList<'ctx>) = visit folder seed l
