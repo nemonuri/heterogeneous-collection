@@ -5,15 +5,15 @@ namespace Nemonuri.Collections.Heterogeneous.Primitives;
 
 public interface IDeconstructorPremise<TConsCollection, THeadContext, THead, TTailContext, TTailCollection>
 {
-    Tuple<THead, TTailCollection> Deconstruct(TConsCollection c);
+    (THead, TTailCollection) Deconstruct(TConsCollection c);
 }
 
 [StructLayout(LayoutKind.Sequential)]
 public unsafe readonly struct DeconstructorHandle<TConsCollection, THeadContext, THead, TTailContext, TTailCollection> : IHandle
 {
-    private readonly delegate*<TConsCollection, Tuple<THead, TTailCollection>> _fp;
+    private readonly delegate*<TConsCollection, (THead, TTailCollection)> _fp;
 
-    internal DeconstructorHandle(delegate*<TConsCollection, Tuple<THead, TTailCollection>> fp)
+    internal DeconstructorHandle(delegate*<TConsCollection, (THead, TTailCollection)> fp)
     {
         _fp = fp;
     }
@@ -22,7 +22,7 @@ public unsafe readonly struct DeconstructorHandle<TConsCollection, THeadContext,
     /// <remarks>Default value is 0.</remarks>
     public nint ToIntPtr() => (nint)_fp;
 
-    public Tuple<THead, TTailCollection> Deconstruct(TConsCollection c) => _fp(c);
+    public (THead, TTailCollection) Deconstruct(TConsCollection c) => _fp(c);
 
     public BoxedDeconstructorHandle<TConsContext, TConsCollection> ToBoxedHandle<TConsContext>() => new(ToIntPtr());
 }
@@ -41,7 +41,7 @@ public readonly struct BoxedDeconstructorHandle<TContext, TCollection> : IHandle
     public nint ToIntPtr() => (nint)_fp;
 
     public unsafe DeconstructorHandle<TCollection, THeadContext, THead, TTailContext, TTailCollection> UnsafeToUnboxedHandle<THeadContext, THead, TTailContext, TTailCollection>() => 
-        new((delegate*<TCollection, Tuple<THead, TTailCollection>>)ToIntPtr());
+        new((delegate*<TCollection, (THead, TTailCollection)>)ToIntPtr());
 }
 
 public static class DeconstructorTheory
@@ -51,7 +51,7 @@ public static class DeconstructorTheory
     {
         public unsafe static DeconstructorHandle<TConsCollection, THeadContext, THead, TTailContext, TTailCollection> ToHandle()
         {
-            static Tuple<THead, TTailCollection> Impl(TConsCollection c) => (new TPremise()).Deconstruct(c);
+            static (THead, TTailCollection) Impl(TConsCollection c) => (new TPremise()).Deconstruct(c);
 
             return new(&Impl);
         }

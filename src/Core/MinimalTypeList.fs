@@ -26,13 +26,13 @@ module MinimalTypeLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>> with
-            member _.Deconstruct (c: MinimalTypeList<'hd -> 'tl>): System.Tuple<TypeHandle<'hd>, MinimalTypeList<'tl>> = 
+            member _.Deconstruct (c: MinimalTypeList<'hd -> 'tl>): System.ValueTuple<TypeHandle<'hd>, MinimalTypeList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
                     let hd = TypeHandles.tryToTypedV<'hd> hdItem |> ValueOption.get
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems }
-                    System.Tuple<_,_>( hd, tl )
+                    System.ValueTuple<_,_>( hd, tl )
 
     end
 
@@ -41,9 +41,9 @@ module MinimalTypeLists = begin
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
-    let decons (l: MinimalTypeList<'hd -> 'tl>) =
+    let deconsV (l: MinimalTypeList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,TypeHandle<'hd>,'tl,MinimalTypeList<'tl>>()
-        dhnd.Deconstruct(l).Deconstruct()
+        dhnd.Deconstruct(l)
 
     let length (l: MinimalHList<'ctx>) = l.Items |> List.length
 

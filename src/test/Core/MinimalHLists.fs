@@ -62,11 +62,11 @@ let ``consAndDecons2 is identity - Test4``() =
 
 let private consAndDecons3 (x1: 'a1, x2: 'a2, x3: 'a3) =
     let l = empty |> cons x1 |> cons x2 |> cons x3 in
-    match decons l with
+    match deconsV l with
     | r3, l ->
-    match decons l with
+    match deconsV l with
     | r2, l -> 
-    match decons l with
+    match deconsV l with
     | r1, _ -> r1, r2, r3
 
 [<Fact>]

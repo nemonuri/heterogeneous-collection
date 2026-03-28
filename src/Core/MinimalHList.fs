@@ -1,5 +1,6 @@
 ﻿namespace Nemonuri.Collections.Heterogeneous
 
+open type System.TupleExtensions
 open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous.Primitives
 
@@ -25,13 +26,13 @@ module MinimalHLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>> with
-            member _.Deconstruct (c: MinimalHList<'hd -> 'tl>): System.Tuple<'hd, MinimalHList<'tl>> = 
+            member _.Deconstruct (c: MinimalHList<'hd -> 'tl>): System.ValueTuple<'hd, MinimalHList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems }
-                    System.Tuple<_,_>( hd, tl )
+                    System.ValueTuple<_,_>( hd, tl )
 
     end
 
@@ -40,9 +41,11 @@ module MinimalHLists = begin
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
-    let decons (l: MinimalHList<'hd -> 'tl>) =
+    let deconsV (l: MinimalHList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,MinimalHList<'tl>>()
         dhnd.Deconstruct(l)
+
+    let decons l = (deconsV l).ToTuple()
 
     let length (l: MinimalHList<'ctx>) = l.Items |> List.length
 
@@ -64,8 +67,8 @@ module MinimalHLists = begin
         let finish<'state> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: MinimalHList<unit>)) : 'state = acc
 
         let step<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: MinimalHList<'hd -> 'tl>)) =
-            match decons l with
-            | ( hd, tl ) ->
+            match deconsV l with
+            | struct ( hd, tl ) ->
                 let state = folder.Step (acc, hd)
                 toFoldEntry folder state tl
 

@@ -23,7 +23,7 @@ module QuickHLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>> with
-            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): System.Tuple<'hd, QuickHList<'tl>> = 
+            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): System.ValueTuple<'hd, QuickHList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem; TailAcceptor = tailAcceptor }::tlItems -> 
@@ -34,7 +34,7 @@ module QuickHLists = begin
                             L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }
-                    System.Tuple<_,_>( hd, tl )
+                    System.ValueTuple<_,_>( hd, tl )
 
     end
 
