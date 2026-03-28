@@ -17,25 +17,21 @@ module QuickHLists = begin
     type private I = QuickHListItem
     type private L<'ctx> = QuickHList<'ctx>
 
-    [<RequireQualifiedAccess>]
-    [<NoEquality; NoComparison; Struct>]
-    type private HeadInfo<'hd,'tl> = { Item: 'hd; TailVisitable: IFolderVisitable<'tl> }
-
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
 
-        static member ToHandle() = DeconstructorTheory.ToHandle<QuickHList<'hd -> 'tl>, 'hd, HeadInfo<'hd,'tl>, 'tl, QuickHList<'tl>, Deconstructor<'hd,'tl>>()
+        static member ToHandle() = DeconstructorTheory.ToHandle<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>, Deconstructor<'hd,'tl>>()
 
-        interface IDeconstructorPremise<QuickHList<'hd -> 'tl>, 'hd, HeadInfo<'hd,'tl>, 'tl, QuickHList<'tl>> with
-            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): struct (HeadInfo<'hd,'tl> * QuickHList<'tl>) = 
+        interface IDeconstructorPremise<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>> with
+            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): struct ('hd * QuickHList<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem; TailVisitable = tailVisitable }::tlItems -> 
-                    let hd : HeadInfo<_,_> = { Item = UntypedItems.unsafeToTyped<'hd> hdItem; TailVisitable = Folders.specializeVisitable<_> tailVisitable }
+                    let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
-                            L.Visitable = hd.TailVisitable; 
+                            L.Visitable = Folders.specializeVisitable<_> tailVisitable; 
                             L.Items = tlItems 
                         }
                     struct ( hd, tl )
@@ -44,14 +40,11 @@ module QuickHLists = begin
 
     (** We need to define deconstructor, before define constructor. *)
 
-    let private deconsInternalV (l: QuickHList<'hd -> 'tl>) =
-        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,HeadInfo<'hd,'tl>,'tl,QuickHList<'tl>>()
+    let deconsV (l: QuickHList<'hd -> 'tl>) =
+        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickHList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         struct (hd, tlc)
 
-    let deconsV l = 
-        match deconsInternalV l with
-        | struct (hd, tl) -> struct (hd.Item, tl)
 
     type private NullAcceptor = class
 
@@ -71,6 +64,11 @@ module QuickHLists = begin
 
     let empty : QuickHList<unit> = { DeconsHandle = Unchecked.defaultof<_>; Visitable = NullAcceptor.Instance; Items = [] }
 
+    let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
+        l.Visitable.Acceptor
+        |> Folders.specializeAcceptor<QuickHList<'ctx>> 
+        |> _.Accept(folder, acc, l)
+
     type private ConsAcceptor<'hd,'tl> = class
 
         private new() = {}
@@ -78,11 +76,9 @@ module QuickHLists = begin
         static member Instance = ConsAcceptor<'hd,'tl>()
 
         member _.Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
-            let struct (hd, tl ) = deconsInternalV elem in
-            let nextAcc = folder.Step(acc, hd.Item) in
-            hd.TailVisitable.Acceptor 
-            |> Folders.specializeAcceptor<QuickHList<'tl>> 
-            |> _.Accept(folder, nextAcc, tl)
+            let struct (hd, tl ) = deconsV elem in
+            let nextAcc = folder.Step(acc, hd) in
+            visit folder nextAcc tl
 
         interface IFolderVisitable<'hd->'tl> with
             member x.Acceptor = x
@@ -96,11 +92,15 @@ module QuickHLists = begin
         let hdItem = 
             { 
                 I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); 
-                I.Item = UntypedItems.ofTyped hd;
-                I.TailVisitable = 
+                I.TailVisitable = tl.Visitable;
+                I.Item = UntypedItems.ofTyped hd
             }
-        let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
-        { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
+        in
+        let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>() in
+        let visitable = ConsAcceptor<'hd,'tl>.Instance in
+        { DeconsHandle = deconsHandle; Visitable = visitable; Items = hdItem::tl.Items }
 
+    (* fold is starter of visit. *)
+    let fold (folder: IFolder<'state>) (seed: 'state) (l: QuickHList<'ctx>) = visit folder seed l
 
 end
