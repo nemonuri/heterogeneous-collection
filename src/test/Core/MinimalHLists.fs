@@ -2,6 +2,7 @@ module Nemonuri.Collections.Heterogeneous.UnitTests.MinimalHLists
 
 open Xunit
 open Nemonuri.Collections.Heterogeneous
+open Nemonuri.Collections.Heterogeneous.Primitives
 open Nemonuri.Collections.Heterogeneous.MinimalHLists
 
 [<Fact>]
@@ -73,9 +74,9 @@ let ``consAndDecons3 is identity``() =
     let xs = 5.6, struct ("Hello", Some "World"), Ok '6' in
     Assert.Equal(xs, consAndDecons3 xs)
 
-let private stringFolder = 
+let internal stringFolder = 
     { new IFolder<string> with 
-        member _.Fold (str: string) (elem: 'T): string = 
+        member _.Step (str: string, elem: 'T): string = 
             if str.Length = 0 then 
                 str + (elem |> box |> _.ToString())
             else
