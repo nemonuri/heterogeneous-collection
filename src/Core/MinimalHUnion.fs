@@ -39,12 +39,12 @@ module MinimalHUnions = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<MinimalHUnion<'hd -> 'tl>, 'hd, unit, 'tl, MinimalHUnion<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<MinimalHUnion<'hd -> 'tl>, 'hd, unit, 'tl, MinimalHUnion<'tl>> with
-            member _.Deconstruct (c: MinimalHUnion<'hd -> 'tl>): DeconstructResult<unit, MinimalHUnion<'tl>> = 
+            member _.Deconstruct (c: MinimalHUnion<'hd -> 'tl>): System.Tuple<unit, MinimalHUnion<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle }::tlItems -> 
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems; L.Witness = c.Witness; L.WitnessedContext = c.WitnessedContext }
-                    DeconstructResult<_,_>( (), tl )
+                    System.Tuple<_,_>( (), tl )
     end
 
     let extend<'hd,'tl> (tl: MinimalHUnion<'tl>) : MinimalHUnion<'hd -> 'tl> =
@@ -60,7 +60,7 @@ module MinimalHUnions = begin
             UntypedItems.unsafeToTyped l.Witness |> Ok
         else
             let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,unit,'tl,MinimalHUnion<'tl>>()
-            let tlc = dhnd.Deconstruct(l).Tail
+            let _, tlc = dhnd.Deconstruct(l)
             Error tlc
 
     module Patterns = begin

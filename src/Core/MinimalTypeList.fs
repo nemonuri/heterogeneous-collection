@@ -26,13 +26,13 @@ module MinimalTypeLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>> with
-            member _.Deconstruct (c: MinimalTypeList<'hd -> 'tl>): DeconstructResult<TypeHandle<'hd>, MinimalTypeList<'tl>> = 
+            member _.Deconstruct (c: MinimalTypeList<'hd -> 'tl>): System.Tuple<TypeHandle<'hd>, MinimalTypeList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
                     let hd = TypeHandles.tryToTypedV<'hd> hdItem |> ValueOption.get
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems }
-                    DeconstructResult<_,_>( hd, tl )
+                    System.Tuple<_,_>( hd, tl )
 
     end
 

@@ -25,13 +25,13 @@ module MinimalHLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>> with
-            member _.Deconstruct (c: MinimalHList<'hd -> 'tl>): DeconstructResult<'hd, MinimalHList<'tl>> = 
+            member _.Deconstruct (c: MinimalHList<'hd -> 'tl>): System.Tuple<'hd, MinimalHList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems }
-                    DeconstructResult<_,_>( hd, tl )
+                    System.Tuple<_,_>( hd, tl )
 
     end
 
@@ -42,7 +42,7 @@ module MinimalHLists = begin
     
     let decons (l: MinimalHList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,MinimalHList<'tl>>()
-        dhnd.Deconstruct(l).Deconstruct()
+        dhnd.Deconstruct(l)
 
     let length (l: MinimalHList<'ctx>) = l.Items |> List.length
 

@@ -19,7 +19,6 @@
       <PropertyGroup>
         <PolySharpIncludeGeneratedTypes>
           System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
-          System.Runtime.CompilerServices.IsExternalInit;
           $(PolySharpIncludeGeneratedTypes)
         </PolySharpIncludeGeneratedTypes>
       </PropertyGroup>
