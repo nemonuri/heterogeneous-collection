@@ -2,18 +2,25 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open System
 open System.Runtime.CompilerServices
+open Nemonuri.Collections.Heterogeneous.Primitives
 
-type IFolder<'TState> = interface
+module Folders = begin
 
-    abstract member Fold<'T> : 'TState -> 'T -> 'TState
+    let trySpecializeVisitableV<'ctx> (x: IFolderVisitable) = 
+        let ok, result = FolderTheory.TrySpecialize<'ctx>(x)
+        if ok then ValueSome result else ValueNone
+    
+    let specializeVisitable<'ctx> x = trySpecializeVisitableV<'ctx> x |> ValueOption.get
+
+    let trySpecializeAcceptorV<'a> (x: IFolderAcceptor) = 
+        let ok, result = FolderTheory.TrySpecialize<'a>(x)
+        if ok then ValueSome result else ValueNone
+
+    let specializeAcceptor<'a> x = trySpecializeAcceptorV<'a> x |> ValueOption.get
 
 end
 
-type IFolderVisitable<'TContext> = interface
 
-    abstract member Accept<'TState, 'T> : folder:IFolder<'TState> * acc:'TState * elem:'T -> 'TState
-
-end
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]

@@ -70,7 +70,7 @@ module MinimalHLists = begin
         let step<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: MinimalHList<'hd -> 'tl>)) =
             match deconsV l with
             | struct ( hd, tl ) ->
-                let state = folder.Fold acc hd
+                let state = folder.Step (acc, hd)
                 toFoldEntry folder state tl
 
         let inline internal ( ! ) entry = step entry
