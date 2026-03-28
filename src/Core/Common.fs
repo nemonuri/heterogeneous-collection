@@ -11,7 +11,7 @@ end
 
 type IFolderVisitable<'TContext> = interface
 
-    abstract member Accept<'TState> : IFolder<'TState> -> 'TState
+    abstract member Accept<'TState, 'T> : folder:IFolder<'TState> * acc:'TState * elem:'T -> 'TState
 
 end
 
