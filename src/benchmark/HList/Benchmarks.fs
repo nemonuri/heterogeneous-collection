@@ -21,47 +21,71 @@ type Benchmarks () =
     
     let guardValueIs3 (n: int) : int = if n = 3 then n else failwithf "%d" n
 
+    [<Params(1, 100)>]
+    member val LoopCount = 1 with get, set
+
     [<Benchmark(Baseline = true)>]
-    member _.HList() : int =
-        HList.empty
-        |> HList.cons 1
-        |> HList.cons "Hello"
-        |> HList.cons '.'
-        |> HList.cons 3
-        |> HList.cons 4.5
-        |> HList.cons 0L
-        |> HList.cons -7
-        |> HList.cons 100u
-        |> HList.fold hlistFolder 0
-        |> guardValueIs3
+    member this.HList() : int =
+        let l =
+            HList.empty
+            |> HList.cons 1
+            |> HList.cons "Hello"
+            |> HList.cons '.'
+            |> HList.cons 3
+            |> HList.cons 4.5
+            |> HList.cons 0L
+            |> HList.cons -7
+            |> HList.cons 100u
+        let mutable acc = 0
+        for i = 1 to this.LoopCount do
+            acc <-
+            l
+            |> HList.fold hlistFolder 0
+            |> guardValueIs3
+            |> (+) acc
+        acc
     
     [<Benchmark>]
-    member _.MinimalHList() : int =
-        MinimalHLists.empty
-        |> MinimalHLists.cons 1
-        |> MinimalHLists.cons "Hello"
-        |> MinimalHLists.cons '.'
-        |> MinimalHLists.cons 3
-        |> MinimalHLists.cons 4.5
-        |> MinimalHLists.cons 0L
-        |> MinimalHLists.cons -7
-        |> MinimalHLists.cons 100u
-        |> MinimalHLists.Folders.fold quickFolder 0
-        |> guardValueIs3
+    member this.MinimalHList() : int =
+        let l =
+            MinimalHLists.empty
+            |> MinimalHLists.cons 1
+            |> MinimalHLists.cons "Hello"
+            |> MinimalHLists.cons '.'
+            |> MinimalHLists.cons 3
+            |> MinimalHLists.cons 4.5
+            |> MinimalHLists.cons 0L
+            |> MinimalHLists.cons -7
+            |> MinimalHLists.cons 100u
+        let mutable acc = 0
+        for i = 1 to this.LoopCount do
+            acc <-
+            l
+            |> MinimalHLists.Folders.fold quickFolder 0
+            |> guardValueIs3
+            |> (+) acc
+        acc
 
     [<Benchmark>]
-    member _.QuickHLists() : int =
-        QuickHLists.empty
-        |> QuickHLists.cons 1
-        |> QuickHLists.cons "Hello"
-        |> QuickHLists.cons '.'
-        |> QuickHLists.cons 3
-        |> QuickHLists.cons 4.5
-        |> QuickHLists.cons 0L
-        |> QuickHLists.cons -7
-        |> QuickHLists.cons 100u
-        |> QuickHLists.fold quickFolder 0
-        |> guardValueIs3
+    member this.QuickHLists() : int =
+        let l =
+            QuickHLists.empty
+            |> QuickHLists.cons 1
+            |> QuickHLists.cons "Hello"
+            |> QuickHLists.cons '.'
+            |> QuickHLists.cons 3
+            |> QuickHLists.cons 4.5
+            |> QuickHLists.cons 0L
+            |> QuickHLists.cons -7
+            |> QuickHLists.cons 100u
+        let mutable acc = 0
+        for i = 1 to this.LoopCount do
+            acc <-
+            l
+            |> QuickHLists.fold quickFolder 0
+            |> guardValueIs3
+            |> (+) acc
+        acc
 
 
 
