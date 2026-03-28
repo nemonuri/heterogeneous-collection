@@ -9,6 +9,12 @@ type IFolder<'TState> = interface
 
 end
 
+type IFolderVisitable<'TContext> = interface
+
+    abstract member Accept<'TState> : IFolder<'TState> -> 'TState
+
+end
+
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
 type internal UntypedItem =
