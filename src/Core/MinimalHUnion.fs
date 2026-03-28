@@ -6,26 +6,26 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickUnionItem = { TailDeconsHandle: nativeint }
+type internal MinimalHUnionItem = { TailDeconsHandle: nativeint }
 
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickUnion<'TContext> = 
+type MinimalHUnion<'TContext> = 
     internal { 
-        DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickUnion<'TContext>>; 
-        Items: QuickUnionItem list;
+        DeconsHandle: BoxedDeconstructorHandle<'TContext, MinimalHUnion<'TContext>>; 
+        Items: MinimalHUnionItem list;
         Witness: UntypedItem;
         WitnessedContext: RuntimeTypeHandle
     }
 
 
-module QuickUnions = begin
+module MinimalHUnions = begin
 
-    type private I = QuickUnionItem
-    type private L<'ctx> = QuickUnion<'ctx>
+    type private I = MinimalHUnionItem
+    type private L<'ctx> = MinimalHUnion<'ctx>
 
-    let make<'hd,'tl> (hd: 'hd) (_: TypeList<'hd->'tl>) : QuickUnion<'hd->'tl> = 
+    let make<'hd,'tl> (hd: 'hd) (_: MinimalTypeList<'hd->'tl>) : MinimalHUnion<'hd->'tl> = 
         {
             DeconsHandle = Unchecked.defaultof<_>;
             Items = [];
@@ -36,10 +36,10 @@ module QuickUnions = begin
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
 
-        static member ToHandle() = DeconstructorTheory.ToHandle<QuickUnion<'hd -> 'tl>, 'hd, unit, 'tl, QuickUnion<'tl>, Deconstructor<'hd,'tl>>()
+        static member ToHandle() = DeconstructorTheory.ToHandle<MinimalHUnion<'hd -> 'tl>, 'hd, unit, 'tl, MinimalHUnion<'tl>, Deconstructor<'hd,'tl>>()
 
-        interface IDeconstructorPremise<QuickUnion<'hd -> 'tl>, 'hd, unit, 'tl, QuickUnion<'tl>> with
-            member _.Deconstruct (c: QuickUnion<'hd -> 'tl>): struct (unit * QuickUnion<'tl>) = 
+        interface IDeconstructorPremise<MinimalHUnion<'hd -> 'tl>, 'hd, unit, 'tl, MinimalHUnion<'tl>> with
+            member _.Deconstruct (c: MinimalHUnion<'hd -> 'tl>): struct (unit * MinimalHUnion<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle }::tlItems -> 
@@ -47,19 +47,19 @@ module QuickUnions = begin
                     struct ( (), tl )
     end
 
-    let extend<'hd,'tl> (tl: QuickUnion<'tl>) : QuickUnion<'hd -> 'tl> =
+    let extend<'hd,'tl> (tl: MinimalHUnion<'tl>) : MinimalHUnion<'hd -> 'tl> =
         let hdItem = { I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr() }
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items; Witness = tl.Witness; WitnessedContext = tl.WitnessedContext }
 
-    let witnessIndex (u: QuickUnion<'ctx>) = u.Items |> List.length
+    let witnessIndex (u: MinimalHUnion<'ctx>) = u.Items |> List.length
 
 
-    let split (l: QuickUnion<'hd->'tl>) : Result<'hd,QuickUnion<'tl>> =
+    let split (l: MinimalHUnion<'hd->'tl>) : Result<'hd,MinimalHUnion<'tl>> =
         if witnessIndex l = 0 then
             UntypedItems.unsafeToTyped l.Witness |> Ok
         else
-            let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,unit,'tl,QuickUnion<'tl>>()
+            let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,unit,'tl,MinimalHUnion<'tl>>()
             let struct (_, tlc)  = dhnd.Deconstruct(l)
             Error tlc
 

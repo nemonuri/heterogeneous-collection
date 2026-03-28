@@ -2,10 +2,10 @@ module Nemonuri.Collections.Heterogeneous.UnitTests.QuickUnions
 
 open Xunit
 open Nemonuri.Collections.Heterogeneous
-open Nemonuri.Collections.Heterogeneous.QuickUnions.Patterns
+open Nemonuri.Collections.Heterogeneous.MinimalHUnions.Patterns
 
-module T = TypeLists
-module U = QuickUnions
+module T = MinimalTypeLists
+module U = MinimalHUnions
 
 [<Fact>]
 let Test1() =

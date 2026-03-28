@@ -7,26 +7,26 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal TypeListItem = { TailDeconsHandle: nativeint; Item: RuntimeTypeHandle }
+type internal MinimalTypeListItem = { TailDeconsHandle: nativeint; Item: RuntimeTypeHandle }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type TypeList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, TypeList<'TContext>>; Items: TypeListItem list }
+type MinimalTypeList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, MinimalTypeList<'TContext>>; Items: MinimalTypeListItem list }
 
-module TypeLists = begin
+module MinimalTypeLists = begin
 
-    type private I = TypeListItem
-    type private L<'ctx> = TypeList<'ctx>
+    type private I = MinimalTypeListItem
+    type private L<'ctx> = MinimalTypeList<'ctx>
 
-    let empty : TypeList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
+    let empty : MinimalTypeList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
 
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
 
-        static member ToHandle() = DeconstructorTheory.ToHandle<TypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, TypeList<'tl>, Deconstructor<'hd,'tl>>()
+        static member ToHandle() = DeconstructorTheory.ToHandle<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>, Deconstructor<'hd,'tl>>()
 
-        interface IDeconstructorPremise<TypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, TypeList<'tl>> with
-            member _.Deconstruct (c: TypeList<'hd -> 'tl>): struct (TypeHandle<'hd> * TypeList<'tl>) = 
+        interface IDeconstructorPremise<MinimalTypeList<'hd -> 'tl>, 'hd, TypeHandle<'hd>, 'tl, MinimalTypeList<'tl>> with
+            member _.Deconstruct (c: MinimalTypeList<'hd -> 'tl>): struct (TypeHandle<'hd> * MinimalTypeList<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
@@ -36,20 +36,20 @@ module TypeLists = begin
 
     end
 
-    let cons<'hd,'tl> (tl: TypeList<'tl>) : TypeList<'hd -> 'tl> =
+    let cons<'hd,'tl> (tl: MinimalTypeList<'tl>) : MinimalTypeList<'hd -> 'tl> =
         let hdItem = { I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); I.Item = TypeHandles.ofType<'hd>.Value }
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
-    let deconsV (l: TypeList<'hd -> 'tl>) =
-        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,TypeHandle<'hd>,'tl,TypeList<'tl>>()
+    let deconsV (l: MinimalTypeList<'hd -> 'tl>) =
+        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,TypeHandle<'hd>,'tl,MinimalTypeList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         struct (hd, tlc)
 
     let decons l =
         match deconsV l with | struct (hd, tl) -> hd, tl
 
-    let length (l: QuickList<'ctx>) = l.Items |> List.length
+    let length (l: MinimalHList<'ctx>) = l.Items |> List.length
 
     let isEmpty l = (length l) = 0
 

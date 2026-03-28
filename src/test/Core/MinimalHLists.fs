@@ -1,8 +1,8 @@
-module Nemonuri.Collections.Heterogeneous.UnitTests.QuickLists
+module Nemonuri.Collections.Heterogeneous.UnitTests.MinimalHLists
 
 open Xunit
 open Nemonuri.Collections.Heterogeneous
-open Nemonuri.Collections.Heterogeneous.QuickLists
+open Nemonuri.Collections.Heterogeneous.MinimalHLists
 
 [<Fact>]
 let ``(length empty) is 0``() =

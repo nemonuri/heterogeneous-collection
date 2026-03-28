@@ -5,27 +5,27 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickListItem = { TailDeconsHandle: nativeint; Item: UntypedItem }
+type internal MinimalHListItem = { TailDeconsHandle: nativeint; Item: UntypedItem }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickList<'TContext>>; Items: QuickListItem list }
+type MinimalHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, MinimalHList<'TContext>>; Items: MinimalHListItem list }
 
 
-module QuickLists = begin
+module MinimalHLists = begin
 
-    type private I = QuickListItem
-    type private L<'ctx> = QuickList<'ctx>
+    type private I = MinimalHListItem
+    type private L<'ctx> = MinimalHList<'ctx>
 
-    let empty : QuickList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
+    let empty : MinimalHList<unit> = { DeconsHandle = Unchecked.defaultof<_> ; Items = [] }
 
     [<NoEquality; NoComparison>]
     type private Deconstructor<'hd,'tl> = struct
 
-        static member ToHandle() = DeconstructorTheory.ToHandle<QuickList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickList<'tl>, Deconstructor<'hd,'tl>>()
+        static member ToHandle() = DeconstructorTheory.ToHandle<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>, Deconstructor<'hd,'tl>>()
 
-        interface IDeconstructorPremise<QuickList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickList<'tl>> with
-            member _.Deconstruct (c: QuickList<'hd -> 'tl>): struct ('hd * QuickList<'tl>) = 
+        interface IDeconstructorPremise<MinimalHList<'hd -> 'tl>, 'hd, 'hd, 'tl, MinimalHList<'tl>> with
+            member _.Deconstruct (c: MinimalHList<'hd -> 'tl>): struct ('hd * MinimalHList<'tl>) = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
@@ -35,20 +35,20 @@ module QuickLists = begin
 
     end
 
-    let cons (hd: 'hd) (tl: QuickList<'tl>) : QuickList<'hd -> 'tl> =
+    let cons (hd: 'hd) (tl: MinimalHList<'tl>) : MinimalHList<'hd -> 'tl> =
         let hdItem = { I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); I.Item = UntypedItems.ofTyped hd }
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     
-    let deconsV (l: QuickList<'hd -> 'tl>) =
-        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickList<'tl>>()
+    let deconsV (l: MinimalHList<'hd -> 'tl>) =
+        let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,MinimalHList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
         struct (hd, tlc)
 
     let decons l =
         match deconsV l with | struct (hd, tl) -> hd, tl
 
-    let length (l: QuickList<'ctx>) = l.Items |> List.length
+    let length (l: MinimalHList<'ctx>) = l.Items |> List.length
 
     let isEmpty l = (length l) = 0
 
@@ -57,7 +57,7 @@ module QuickLists = begin
     module Folders = begin
 
         [<NoEquality; NoComparison; Struct>]
-        type FoldEntry<'TState, 'TContext> = { Folder: IFolder<'TState>; State: 'TState; List: QuickList<'TContext> }
+        type FoldEntry<'TState, 'TContext> = { Folder: IFolder<'TState>; State: 'TState; List: MinimalHList<'TContext> }
 
         let toFoldEntry folder acc l = { Folder = folder; State = acc; List = l }
 
@@ -65,9 +65,9 @@ module QuickLists = begin
 
         let (|FoldEntryV|) entry = ofFoldEntryV entry
 
-        let finish<'state> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<unit>)) : 'state = acc
+        let finish<'state> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: MinimalHList<unit>)) : 'state = acc
 
-        let step<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: QuickList<'hd -> 'tl>)) =
+        let step<'state, 'hd, 'tl> (FoldEntryV struct ( folder: IFolder<'state>, acc: 'state, l: MinimalHList<'hd -> 'tl>)) =
             match deconsV l with
             | struct ( hd, tl ) ->
                 let state = folder.Fold acc hd
