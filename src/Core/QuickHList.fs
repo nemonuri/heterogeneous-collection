@@ -25,7 +25,7 @@ module QuickHLists = begin
         static member ToHandle() = DeconstructorTheory.ToHandle<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>, Deconstructor<'hd,'tl>>()
 
         interface IDeconstructorPremise<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>> with
-            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): struct ('hd * QuickHList<'tl>) = 
+            member _.Deconstruct (c: QuickHList<'hd -> 'tl>): DeconstructResult<'hd, QuickHList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem; TailAcceptor = tailAcceptor }::tlItems -> 
@@ -36,7 +36,7 @@ module QuickHLists = begin
                             L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }
-                    struct ( hd, tl )
+                    DeconstructResult<_,_>( hd, tl )
 
     end
 
@@ -44,8 +44,7 @@ module QuickHLists = begin
 
     let decons (l: QuickHList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickHList<'tl>>()
-        let struct (hd, tlc)  = dhnd.Deconstruct(l)
-        (hd, tlc)
+        dhnd.Deconstruct(l).Deconstruct()
 
 
     [<NoEquality; NoComparison; Sealed>]
