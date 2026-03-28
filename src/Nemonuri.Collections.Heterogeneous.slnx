@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/benchmark/">
+    <Project Path="benchmark/HList.ConsOnly/HList.ConsOnly.fsproj" />
     <Project Path="benchmark/HList/HList.fsproj" />
   </Folder>
   <Folder Name="/src/">

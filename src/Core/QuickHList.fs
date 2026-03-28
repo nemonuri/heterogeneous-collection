@@ -31,7 +31,7 @@ module QuickHLists = begin
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
-                            L.Acceptor = Folders.specializeAcceptor<_> tailAcceptor; 
+                            L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }
                     struct ( hd, tl )
