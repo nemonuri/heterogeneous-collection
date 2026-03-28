@@ -2,13 +2,15 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous.Primitives
+open System.Runtime.CompilerServices
+
 
 [<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
+[<NoEquality; NoComparison; Struct; IsReadOnly>]
 type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderAcceptor; Item: UntypedItem; }
 
 [<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
+[<NoEquality; NoComparison; Struct; IsReadOnly>]
 type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderAcceptor<QuickHList<'TContext>>; Items: QuickHListItem list }
 
 
@@ -17,7 +19,7 @@ module QuickHLists = begin
     type private I = QuickHListItem
     type private L<'ctx> = QuickHList<'ctx>
 
-    [<NoEquality; NoComparison>]
+    [<NoEquality; NoComparison; IsReadOnly>]
     type private Deconstructor<'hd,'tl> = struct
 
         static member ToHandle() = DeconstructorTheory.ToHandle<QuickHList<'hd -> 'tl>, 'hd, 'hd, 'tl, QuickHList<'tl>, Deconstructor<'hd,'tl>>()
@@ -40,10 +42,10 @@ module QuickHLists = begin
 
     (** We need to define deconstructor, before define constructor. *)
 
-    let deconsV (l: QuickHList<'hd -> 'tl>) =
+    let decons (l: QuickHList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickHList<'tl>>()
         let struct (hd, tlc)  = dhnd.Deconstruct(l)
-        struct (hd, tlc)
+        (hd, tlc)
 
 
     [<NoEquality; NoComparison; Sealed>]
@@ -81,7 +83,7 @@ module QuickHLists = begin
         static member Instance = ConsAcceptor<'hd,'tl>()
 
         static member Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
-            let struct (hd, tl ) = deconsV elem in
+            let (hd, tl ) = decons elem in
             let nextAcc = folder.Step(acc, hd) in
             visit folder nextAcc tl
         

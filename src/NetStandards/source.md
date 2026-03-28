@@ -1,0 +1,1 @@
+https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Runtime/CompilerServices/IsReadOnlyAttribute.cs

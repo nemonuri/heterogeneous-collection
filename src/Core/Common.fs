@@ -23,7 +23,7 @@ end
 
 
 [<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
+[<NoEquality; NoComparison; Struct; IsReadOnly>]
 type internal UntypedItem =
 | Primitive of p: int64
 | Object of o: obj
