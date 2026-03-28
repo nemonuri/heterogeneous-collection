@@ -1,10 +1,13 @@
 <Solution>
+  <Folder Name="/benchmark/">
+    <Project Path="benchmark/HList/HList.fsproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="Primitives/Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
     <Project Path="Core/Nemonuri.Collections.Heterogeneous.Core.fsproj" />
     <Project Path="Handles/Nemonuri.Handles.csproj" />
   </Folder>
-  <Folder Name="/test/" >
+  <Folder Name="/test/">
     <Project Path="test/Core/Nemonuri.Collections.Heterogeneous.Core.UnitTests.fsproj" />
   </Folder>
 </Solution>
