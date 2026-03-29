@@ -5,11 +5,11 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderAcceptor; Item: UntypedItem; }
+type internal QuickHListItem = { TailDeconsHandle: nativeint; Item: UntypedItem; }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderAcceptor<QuickHList<'TContext>>; Items: QuickHListItem list }
+type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Items: QuickHListItem list }
 
 
 module QuickHLists = begin
@@ -26,12 +26,11 @@ module QuickHLists = begin
             member _.Deconstruct (c: QuickHList<'hd -> 'tl>): System.ValueTuple<'hd, QuickHList<'tl>> = 
                 match c.Items with
                 | [] -> failwith "Unreachable"
-                | { TailDeconsHandle = tlHandle; Item = hdItem; TailAcceptor = tailAcceptor }::tlItems -> 
+                | { TailDeconsHandle = tlHandle; Item = hdItem; }::tlItems -> 
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
-                            L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }
                     System.ValueTuple<_,_>( hd, tl )
@@ -47,7 +46,7 @@ module QuickHLists = begin
     [<AbstractClass; Sealed>]
     type private AcceptorStore<'tl> = class
 
-        static member val Value: IFolderAcceptor<QuickHList<'tl>> | null = null with get, set
+        static member val Value: IFolderAcceptor<QuickHList<'tl>> = Unchecked.defaultof<_> with get, set
 
     end
 
@@ -55,10 +54,9 @@ module QuickHLists = begin
     [<NoEquality; NoComparison>]
     type private NullAcceptor = struct
 
-        static member Instance = 
-            let r = NullAcceptor()
-            AcceptorStore<unit>.Value <- r
-            r
+        static let Instance = NullAcceptor()
+
+        static member Init() = AcceptorStore<unit>.Value <- Instance
 
         static member Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
         
@@ -67,27 +65,33 @@ module QuickHLists = begin
 
     end
 
-    let empty : QuickHList<unit> = { DeconsHandle = Unchecked.defaultof<_>; Acceptor = NullAcceptor.Instance; Items = [] }
+    let empty : QuickHList<unit> = NullAcceptor.Init(); { DeconsHandle = Unchecked.defaultof<_>; Items = [] }
 
     let length (l: QuickHList<'ctx>) = l.Items |> List.length
 
     let isEmpty (l: QuickHList<'ctx>) = l.Items |> List.isEmpty
 
-    let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
-        l.Acceptor.Accept(folder, acc, l)
+    //let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
+    //    l.Acceptor.Accept(folder, acc, l)
 
     [<NoEquality; NoComparison>]
     type private ConsAcceptor<'hd,'tl> = struct
 
-        static member Instance = 
-            let r = ConsAcceptor<'hd,'tl>()
-            AcceptorStore<'hd->'tl>.Value <- r
-            r
+        static let Instance = ConsAcceptor<'hd,'tl>()
+
+        static let mutable prevInstance: IFolderAcceptor<QuickHList<'tl>> = Unchecked.defaultof<_>
+
+        static member Init() = 
+            match prevInstance with
+            | null ->
+                AcceptorStore<'hd -> 'tl>.Value <- Instance
+                prevInstance <- AcceptorStore<'tl>.Value
+            | _ -> ()
 
         static member Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
             let struct (hd, tl ) = deconsV elem in
             let nextAcc = folder.Step(acc, hd) in
-            AcceptorStore<'tl>.Value |> nonNull |> _.Accept(folder, nextAcc, tl)
+            prevInstance.Accept(folder, nextAcc, tl)
         
         interface IFolderAcceptor<QuickHList<'hd->'tl>> with
             member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
@@ -98,15 +102,15 @@ module QuickHLists = begin
         let hdItem = 
             { 
                 I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); 
-                I.TailAcceptor = tl.Acceptor;
                 I.Item = UntypedItems.ofTyped hd
             }
         in
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>() in
-        let visitable = ConsAcceptor<'hd,'tl>.Instance in
-        { DeconsHandle = deconsHandle; Acceptor = visitable; Items = hdItem::tl.Items }
+        ConsAcceptor<'hd,'tl>.Init();
+        { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
 
     (* fold is starter of visit. *)
-    let fold (folder: IFolder<'state>) (seed: 'state) (l: QuickHList<'ctx>) = visit folder seed l
+    let fold (folder: IFolder<'state>) (seed: 'state) (l: QuickHList<'ctx>) = //visit folder seed l
+        AcceptorStore<'ctx>.Value.Accept(folder, seed, l)
 
 end
