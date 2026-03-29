@@ -1,7 +1,5 @@
 namespace Nemonuri.Collections.Heterogeneous
 
-open System.Threading
-open System.Runtime.CompilerServices
 open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous.Primitives
 
@@ -67,30 +65,8 @@ module QuickHLists = begin
 
     let isEmpty (l: QuickHList<'ctx>) = l.Items |> List.isEmpty
 
-    type private Acceptor<'ctx, 's> = IFolder<'s> -> 's -> QuickHList<'ctx> -> 's
-
-    type private AcceptorCache<'ctx, 's> = class
-
-        static let mutable Instance: Acceptor<'ctx, 's> | null = null
-
-        static member Write(v: Acceptor<'ctx, 's>) = Instance <- v
-
-        static member Read() : Acceptor<'ctx, 's> | null = Instance
-
-        static member ReadForce() = Instance
-
-    end
-
     let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
-        let acceptor =
-            match AcceptorCache<'ctx, 's>.Read() with
-            | null -> 
-                let toWrite = fun folder0 acc0 l0 -> l.Acceptor.Accept<'s>(folder0, acc0, l0)
-                AcceptorCache<'ctx, 's>.Write(toWrite)
-                toWrite
-            | cached -> cached
-        acceptor folder acc l
- 
+        l.Acceptor.Accept(folder, acc, l)
 
     [<NoEquality; NoComparison; Sealed>]
     type private ConsAcceptor<'hd,'tl> = class
