@@ -8,13 +8,12 @@ open BenchmarkDotNet.Attributes
 open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
+open BenchmarkDotNet.Configs
 
 
 [<MemoryDiagnoser; ExceptionDiagnoser>]
-[<SimpleJob(RuntimeMoniker.NativeAot80)>]
-[<SimpleJob(RuntimeMoniker.Net80)>]
-[<SimpleJob(RuntimeMoniker.Net10_0)>]
 [<AnyCategoriesFilter("Standard")>]
+[<SimpleJob(RuntimeMoniker.Net10_0)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
