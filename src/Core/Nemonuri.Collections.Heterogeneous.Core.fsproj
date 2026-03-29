@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
+    <PackageReference Include="FSharp.Core"/>
   </ItemGroup>
 </Project>

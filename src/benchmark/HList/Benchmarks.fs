@@ -2,25 +2,24 @@
 
 open System
 open BenchmarkDotNet
+open BenchmarkDotNet.Jobs
 open BenchmarkDotNet.Diagnosers
 open BenchmarkDotNet.Attributes
-open HCollections
+//open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
-open BenchmarkDotNet.Diagnostics.Windows.Configs;
 
 
-[<MemoryDiagnoser; ExceptionDiagnoser>]
-[<DisassemblyDiagnoser(printInstructionAddresses = true, syntax = DisassemblySyntax.Masm)>]
-#if false
-[<EtwProfiler>]
-#endif
+[<SimpleJob(RuntimeMoniker.NativeAot90)>]
+[<SimpleJob(RuntimeMoniker.Net10_0)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
 
+#if false
     let hlistFolder : HListFolder<int> = 
         { new HListFolder<int> with member _.Folder (acc: int) (x: 'a): int = foldImpl acc x }
+#endif
     
     let quickFolder : IFolder<int> = 
         { new IFolder<int> with member _.Step (acc: int, elem: 'T): int = foldImpl acc elem }
@@ -30,6 +29,7 @@ type Benchmarks () =
     [<Params(1, 100)>]
     member val LoopCount = 1 with get, set
 
+#if false
     [<Benchmark(Baseline = true)>]
     member this.HList() : int =
         let l =
@@ -50,7 +50,8 @@ type Benchmarks () =
             |> guardValueIs3
             |> (+) acc
         acc
-    
+#endif
+
     [<Benchmark>]
     member this.MinimalHList() : int =
         let l =

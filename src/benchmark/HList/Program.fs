@@ -1,7 +1,6 @@
 ﻿open System
 open BenchmarkDotNet.Running
 open BenchmarkDotNet.Configs
-open BenchmarkDotNet.Diagnostics.Windows;
 open HList
 
 type Dummy = struct end
