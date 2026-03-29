@@ -42,8 +42,7 @@ module QuickHLists = begin
 
     let deconsV (l: QuickHList<'hd -> 'tl>) =
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickHList<'tl>>()
-        let struct (hd, tlc)  = dhnd.Deconstruct(l)
-        struct (hd, tlc)
+        dhnd.Deconstruct(l)
 
 
     [<NoEquality; NoComparison; Sealed>]
@@ -64,13 +63,9 @@ module QuickHLists = begin
 
     let length (l: QuickHList<'ctx>) = l.Items |> List.length
 
-    let isEmpty (l: QuickHList<'ctx>) = 
-        match l.Items with
-        | [] -> true
-        | _ -> false
+    let isEmpty (l: QuickHList<'ctx>) = l.Items |> List.isEmpty
 
     let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
-        if isEmpty l then acc else
         l.Acceptor.Accept(folder, acc, l)
 
     [<NoEquality; NoComparison; Sealed>]

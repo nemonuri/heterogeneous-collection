@@ -2,13 +2,19 @@
 
 open System
 open BenchmarkDotNet
+open BenchmarkDotNet.Diagnosers
 open BenchmarkDotNet.Attributes
 open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
+open BenchmarkDotNet.Diagnostics.Windows.Configs;
 
 
 [<MemoryDiagnoser; ExceptionDiagnoser>]
+[<DisassemblyDiagnoser(printInstructionAddresses = true, syntax = DisassemblySyntax.Masm)>]
+#if false
+[<EtwProfiler>]
+#endif
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
