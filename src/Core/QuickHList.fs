@@ -45,10 +45,8 @@ module QuickHLists = begin
         dhnd.Deconstruct(l)
 
 
-    [<NoEquality; NoComparison; Sealed>]
-    type private NullAcceptor = class
-
-        private new() = {}
+    [<NoEquality; NoComparison>]
+    type private NullAcceptor = struct
 
         static member Instance = NullAcceptor()
 
@@ -68,17 +66,15 @@ module QuickHLists = begin
     let private visit (folder: IFolder<'s>) (acc: 's) (l: QuickHList<'ctx>) : 's =
         l.Acceptor.Accept(folder, acc, l)
 
-    [<NoEquality; NoComparison; Sealed>]
-    type private ConsAcceptor<'hd,'tl> = class
-
-        private new() = {}
+    [<NoEquality; NoComparison>]
+    type private ConsAcceptor<'hd,'tl when 'tl :> IFolderAcceptor<QuickHList<'tl>> and 'tl : unmanaged> = struct
 
         static member Instance = ConsAcceptor<'hd,'tl>()
 
         static member Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
             let struct (hd, tl ) = deconsV elem in
             let nextAcc = folder.Step(acc, hd) in
-            visit folder nextAcc tl
+            Unchecked.defaultof<'tl>.Accept(folder, nextAcc, tl)
         
         interface IFolderAcceptor<QuickHList<'hd->'tl>> with
             member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
