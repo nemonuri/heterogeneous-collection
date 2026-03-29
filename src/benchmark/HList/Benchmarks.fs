@@ -12,8 +12,8 @@ open BenchmarkDotNet.Configs
 
 
 [<MemoryDiagnoser; ExceptionDiagnoser>]
-[<AnyCategoriesFilter("Standard")>]
-[<SimpleJob(RuntimeMoniker.Net10_0)>]
+[<AnyCategoriesFilter("Standard", "All")>]
+[<ShortRunJob(RuntimeMoniker.Net10_0)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc

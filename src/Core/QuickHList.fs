@@ -44,11 +44,21 @@ module QuickHLists = begin
         let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,'hd,'tl,QuickHList<'tl>>()
         dhnd.Deconstruct(l)
 
+    [<AbstractClass; Sealed>]
+    type private AcceptorStore<'tl> = class
+
+        static member val Value: IFolderAcceptor<QuickHList<'tl>> | null = null with get, set
+
+    end
+
 
     [<NoEquality; NoComparison>]
     type private NullAcceptor = struct
 
-        static member Instance = NullAcceptor()
+        static member Instance = 
+            let r = NullAcceptor()
+            AcceptorStore<unit>.Value <- r
+            r
 
         static member Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
         
@@ -67,14 +77,17 @@ module QuickHLists = begin
         l.Acceptor.Accept(folder, acc, l)
 
     [<NoEquality; NoComparison>]
-    type private ConsAcceptor<'hd,'tl when 'tl :> IFolderAcceptor<QuickHList<'tl>> and 'tl : unmanaged> = struct
+    type private ConsAcceptor<'hd,'tl> = struct
 
-        static member Instance = ConsAcceptor<'hd,'tl>()
+        static member Instance = 
+            let r = ConsAcceptor<'hd,'tl>()
+            AcceptorStore<'hd->'tl>.Value <- r
+            r
 
         static member Accept (folder: IFolder<'s>, acc: 's, elem: QuickHList<'hd->'tl>): 's = 
             let struct (hd, tl ) = deconsV elem in
             let nextAcc = folder.Step(acc, hd) in
-            Unchecked.defaultof<'tl>.Accept(folder, nextAcc, tl)
+            AcceptorStore<'tl>.Value |> nonNull |> _.Accept(folder, nextAcc, tl)
         
         interface IFolderAcceptor<QuickHList<'hd->'tl>> with
             member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
