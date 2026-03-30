@@ -9,8 +9,11 @@ open BenchmarkDotNet.Attributes
 open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
+open BenchmarkDotNet.Diagnostics.Windows.Configs
 
 [<MemoryDiagnoser>]
+[<EtwProfiler; InliningDiagnoser(true,true); TailCallDiagnoser; DisassemblyDiagnoser>]
+[<ShortRunJob(RuntimeMoniker.Net10_0)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
@@ -24,7 +27,7 @@ type Benchmarks () =
     
     let guardValueIs5 (n: int) : int = if n = 5 then n else failwithf "%d" n
 
-    let anonRecord = {| Name = "John"; Age = 23 |}
+    static let anonRecord = {| Name = "John"; Age = 23 |}
 
     [<Params(1, 100, 10000)>]
     member val public FoldLoop:int = 1 with get,set
