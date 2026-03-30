@@ -1,3 +1,5 @@
+#nowarn "42"
+
 module Nemonuri.Collections.Heterogeneous.UnitTests.QuickHLists
 
 open Xunit
@@ -10,9 +12,11 @@ type Ty<'T> = struct end
 
 let ty<'a> = Ty<'a>()
 
+let private retype<'T,'U> (x:'T) : 'U = (# "" x : 'U #)
+
 let (|Type|_|) (_: Ty<'a>) (x: 'b) =
     if typeof<'a> = typeof<'b> then
-        ValueSome (RetypeTheory.UnsafeRetype<'b,'a>(&x))
+        ValueSome (retype<'b,'a> x)
     else
         ValueNone
 

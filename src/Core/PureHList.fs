@@ -1,3 +1,5 @@
+#nowarn "42"
+
 namespace rec Nemonuri.Collections.Heterogeneous
 
 open System
@@ -17,13 +19,15 @@ module PureHLists = begin
 
     type private Context<'hd, 'tl> = System.ValueTuple<'hd, PureHList<'tl>>
 
+    let inline private retype<'T,'U> (x:'T) : 'U = (# "" x : 'U #)
+
     [<NoEquality; NoComparison>]
     type private IdentityArrow<'ctx, 'hd, 'tl> = struct
 
         interface IArrowPremise<'ctx, Context<'hd, 'tl>> with
             member x.Apply (source: 'ctx): Context<'hd, 'tl> = 
                 assert ( typeof<'ctx> = typeof<Context<'hd, 'tl>> );
-                source |> unbox
+                source |> retype
 
     end
 
@@ -46,16 +50,8 @@ module PureHLists = begin
 
     end
 
-    [<RequireQualifiedAccess>]
-    module private Unsafe = begin
 
-        let empty<'ctx> : PureHList<'ctx> = PureHList.Empty
-
-        let unifiedEmtpy<'hd, 'tl> : PureHList<Context<'hd, 'tl>> = empty<_>
-
-    end
-
-    let empty = Unsafe.empty<vunit>
+    let empty: PureHList<vunit> = PureHList.Empty
 
     let isEmpty l = 
         match l with
@@ -72,20 +68,11 @@ module PureHLists = begin
         let ctx = struct (hd, l) in
         let arrowPtr = ArrowTheory.ToHandle<_,_,IdentityArrow<Context<'hd, 'tl>, 'hd, 'tl>>().ToIntPtr() in
         PureHList.Cons (ctx, arrowPtr, PureHLists.Visitable<'hd,'tl>.Instance)
-
-
-    [<NoEquality; NoComparison; Struct>]
-    type private FoldOnceEntry<'state, 'hd, 'tl> = | FoldOnceEntry of folder: IFolder<'state> * acc: 'state * l: PureHList<Context<'hd, 'tl>>
-
-    [<NoEquality; NoComparison; Struct>]
-    type private FoldOnceResult<'state, 'tl> = | FoldOnceResult of acc: 'state * tl: PureHList<'tl>
-
-    let private foldOnce<'state, 'hd, 'tl> (FoldOnceEntry(folder: IFolder<'state>, acc: 'state, l: PureHList<Context<'hd, 'tl>>)) : FoldOnceResult<'state, 'tl> =
-        match tryDecons l with
-        | ValueNone -> FoldOnceResult (acc, Unsafe.empty<_>)
-        | ValueSome ctx ->
-        match ctx with
-        | struct (hd, tl) -> FoldOnceResult ( folder.Step<'hd>(acc, hd) , tl )
+    
+    let private fold_core (folder: IFolder<'state>) (acc: 'state) (l: PureHList<'ctx>) =
+        match l with
+        | PureHList.Cons (ctx, _, visitable) -> visitable.Accept(folder, acc, ctx)
+        | _ -> acc
             
     
     type internal IFolderVisitable<'ctx> = interface
@@ -102,12 +89,15 @@ module PureHLists = begin
 
         static member Accept<'state> (folder: IFolder<'state>, acc: 'state, ctx: Context<'hd,'tl>): 'state = 
             let struct (hd, tl) = ctx in
-            folder.Step<'hd>(acc, hd)
+            let nextAcc = folder.Step<'hd>(acc, hd)
+            fold_core folder nextAcc tl
 
         interface IFolderVisitable<Context<'hd, 'tl>> with
             member _.Accept (folder, acc, ctx) = Visitable<'hd, 'tl>.Accept(folder, acc, ctx)
 
     end
+
+    let fold folder acc l = fold_core folder acc l
 
 
 end

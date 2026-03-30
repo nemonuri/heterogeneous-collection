@@ -67,6 +67,25 @@ type Benchmarks () =
         |> QuickHLists.cons anonRecord
         |> QuickHLists.cons (ValueSome 3)
 
+    member _.mkPureHList() =
+        PureHLists.empty
+        |> PureHLists.cons 1
+        |> PureHLists.cons "Hello"
+        |> PureHLists.cons '.'
+        |> PureHLists.cons 3
+        |> PureHLists.cons 4.5
+        |> PureHLists.cons 0L
+        |> PureHLists.cons -7
+        |> PureHLists.cons 100u
+        |> PureHLists.cons struct (1, 2)
+        |> PureHLists.cons '5'B
+        |> PureHLists.cons ()
+        |> PureHLists.cons 8
+        |> PureHLists.cons DBNull.Value
+        |> PureHLists.cons 0
+        |> PureHLists.cons anonRecord
+        |> PureHLists.cons (ValueSome 3)
+
     [<Benchmark(Baseline = true)>]
     member this.HList() : int =
         let mutable acc: int = 0
@@ -84,5 +103,15 @@ type Benchmarks () =
             acc <-
             this.mkQuickHList()
             |> QuickHLists.fold quickFolder 0
+            |> guardValueIs5
+        acc
+
+    [<Benchmark>]
+    member this.PureHLists() : int =
+        let mutable acc: int = 0
+        for i = 1 to this.FoldLoop do
+            acc <-
+            this.mkPureHList()
+            |> PureHLists.fold quickFolder 0
             |> guardValueIs5
         acc
