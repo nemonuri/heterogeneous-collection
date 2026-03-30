@@ -6,10 +6,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="MinimalHList.fs" /><Compile Include="MinimalTypeList.fs" /><Compile Include="MinimalHUnion.fs" /><Compile Include="QuickHList.fs" />
+    <Compile Include="MinimalHList.fs" /><Compile Include="MinimalTypeList.fs" /><Compile Include="MinimalHUnion.fs" /><Compile Include="QuickHList.fs" /><Compile Include="PureHList.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
-    <PackageReference Include="FSharp.Core"/>
+    <PackageReference Include="FSharp.Core" />
   </ItemGroup>
 </Project>

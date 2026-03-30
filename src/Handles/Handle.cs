@@ -7,14 +7,6 @@ public interface IHandle
     nint ToIntPtr();
 }
 
-public static class RetypeTheory
-{
-    public static TTo UnsafeRetype<TFrom, TTo>(scoped ref readonly TFrom from)
-    {
-        return Unsafe.As<TFrom, TTo>(ref Unsafe.AsRef(in from));
-    }
-}
-
 
 public static class HandleTheory
 {
@@ -46,8 +38,13 @@ public static class HandleTheory
         return Unsafe.SizeOf<THandle>() == IntPtr.Size;
     }
 
-    public static THandle UnsafeAsHandle<THandle>(nint ptr)
+    public static THandle UnsafeFromIntPtr<THandle>(nint ptr)
     {
         return RetypeTheory.UnsafeRetype<nint, THandle>(in ptr);
+    }
+
+    public static nint UnsafeToIntPtr<THandle>(in THandle handle)
+    {
+        return RetypeTheory.UnsafeRetype<THandle, nint>(in handle);
     }
 }

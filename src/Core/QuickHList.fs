@@ -30,7 +30,7 @@ module QuickHLists = begin
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
                     let tl = 
                         { 
-                            L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); 
+                            L.DeconsHandle = HandleTheory.UnsafeFromIntPtr<_>(tlHandle); 
                             L.Acceptor = tailAcceptor |> unbox; // Folders.specializeAcceptor<_>
                             L.Items = tlItems 
                         }

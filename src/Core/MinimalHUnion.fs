@@ -43,7 +43,7 @@ module MinimalHUnions = begin
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle }::tlItems -> 
-                    let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems; L.Witness = c.Witness; L.WitnessedContext = c.WitnessedContext }
+                    let tl = { L.DeconsHandle = HandleTheory.UnsafeFromIntPtr<_>(tlHandle); L.Items = tlItems; L.Witness = c.Witness; L.WitnessedContext = c.WitnessedContext }
                     System.ValueTuple<_,_>( (), tl )
     end
 

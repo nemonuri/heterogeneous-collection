@@ -31,7 +31,7 @@ module MinimalHLists = begin
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
                     let hd = UntypedItems.unsafeToTyped<'hd> hdItem
-                    let tl = { L.DeconsHandle = HandleTheory.UnsafeAsHandle<_>(tlHandle); L.Items = tlItems }
+                    let tl = { L.DeconsHandle = HandleTheory.UnsafeFromIntPtr<_>(tlHandle); L.Items = tlItems }
                     System.ValueTuple<_,_>( hd, tl )
 
     end
