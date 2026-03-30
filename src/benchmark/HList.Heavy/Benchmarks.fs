@@ -120,7 +120,7 @@ type Benchmarks () =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
-            let l = this.mkPureHList() in
-            PureHLists.fold pureFolder 0 &l
+            this.mkPureHList()
+            |> PureHLists.fold quickFolder 0
             |> guardValueIs5
         acc

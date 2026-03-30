@@ -7,11 +7,11 @@ open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
+[<NoEquality; NoComparison>]
 type PureHList<'ctx> =
     private
     | Empty
-    | Cons of ctx:'ctx * arrowPtr:nativeint * visitable:IInRefFolderVisitable<'ctx>
+    | Cons of ctx:'ctx * arrowPtr:nativeint * visitable:IFolderVisitable<'ctx>
 
 module PureHLists = begin
 
@@ -50,9 +50,9 @@ module PureHLists = begin
 
     let empty: PureHList<vunit> = PureHList.Empty
 
-    let isEmpty (l: inref<PureHList<_>>) = l.IsEmpty
+    let isEmpty (l: PureHList<_>) = l.IsEmpty
 
-    let tryDecons (l: inref<PureHList<_>>) =
+    let tryDeconsV (l: PureHList<_>) =
         let mutable result = Unchecked.defaultof<_>
         let mutable error = Unchecked.defaultof<_>
         let ok = Decons<_,_,_>.TryDeconstruct(&l, &result, &error)
@@ -62,9 +62,9 @@ module PureHLists = begin
         let arrowPtr = InArrowTheory.ToHandle<_,_,IdentityArrow<Context<'hd, 'tl>, 'hd, 'tl>>().ToIntPtr() in
         PureHList.Cons (struct (hd, l), arrowPtr, PureHLists.Visitable<'hd,'tl>.Instance)
     
-    let private fold_core (folder: IInRefFolder<'state>) (acc: inref<'state>) (l: inref<PureHList<'ctx>>) =
+    let private fold_core (folder: IFolder<'state>) (acc: 'state) (l: PureHList<'ctx>) =
         match l with
-        | PureHList.Cons (ctx, _, visitable) -> visitable.Accept(folder, &acc, &ctx)
+        | PureHList.Cons (ctx, _, visitable) -> visitable.Accept(folder, acc, ctx)
         | _ -> acc
             
 
@@ -74,17 +74,17 @@ module PureHLists = begin
 
         static member Instance : Visitable<'hd, 'tl> = Visitable<_,_>()
 
-        static member Accept<'state> (folder: IInRefFolder<'state>, acc: inref<'state>, ctx: inref<Context<'hd,'tl>>): 'state = 
+        static member Accept<'state> (folder: IFolder<'state>, acc: 'state, ctx: Context<'hd,'tl>): 'state = 
             let struct (hd, tl) = ctx in
-            let nextAcc = folder.Step<'hd>(&acc, &hd)
-            fold_core folder &nextAcc &tl
+            let nextAcc = folder.Step<'hd>(acc, hd)
+            fold_core folder nextAcc tl
 
-        interface IInRefFolderVisitable<Context<'hd, 'tl>> with
-            member _.Accept (folder, acc, ctx) = Visitable<'hd, 'tl>.Accept(folder, &acc, &ctx)
+        interface IFolderVisitable<Context<'hd, 'tl>> with
+            member _.Accept (folder, acc, ctx) = Visitable<'hd, 'tl>.Accept(folder, acc, ctx)
 
     end
 
-    let fold folder (seed: 'state) (l: inref<PureHList<'ctx>>) = fold_core folder &seed &l
+    let fold folder (seed: 'state) (l: PureHList<'ctx>) = fold_core folder seed l
 
 
 end
