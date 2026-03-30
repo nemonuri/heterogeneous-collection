@@ -7,7 +7,6 @@ public interface IHandle
     nint ToIntPtr();
 }
 
-
 public static class HandleTheory
 {
     public static bool CheckHasValue(nint intPtr)

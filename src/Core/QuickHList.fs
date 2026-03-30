@@ -5,11 +5,11 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderAcceptor; Item: UntypedItem; }
+type internal QuickHListItem = { TailDeconsHandle: nativeint; TailAcceptor: IFolderVisitable; Item: BoxedValue; }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderAcceptor<QuickHList<'TContext>>; Items: QuickHListItem list }
+type QuickHList<'TContext> = internal { DeconsHandle: BoxedDeconstructorHandle<'TContext, QuickHList<'TContext>>; Acceptor: IFolderVisitable<QuickHList<'TContext>>; Items: QuickHListItem list }
 
 
 module QuickHLists = begin
@@ -27,7 +27,7 @@ module QuickHLists = begin
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem; TailAcceptor = tailAcceptor }::tlItems -> 
-                    let hd = UntypedItems.unsafeToTyped<'hd> hdItem
+                    let hd = BoxedValues.unsafeToTyped<'hd> hdItem
                     let tl = 
                         { 
                             L.DeconsHandle = HandleTheory.UnsafeFromIntPtr<_>(tlHandle); 
@@ -54,7 +54,7 @@ module QuickHLists = begin
 
         static member Accept (_: IFolder<'s>, acc: 's, _: QuickHList<unit>): 's = acc
         
-        interface IFolderAcceptor<QuickHList<unit>> with
+        interface IFolderVisitable<QuickHList<unit>> with
             member _.Accept (folder, acc, elem) = NullAcceptor.Accept(folder, acc, elem)
 
     end
@@ -80,7 +80,7 @@ module QuickHLists = begin
             let nextAcc = folder.Step(acc, hd) in
             visit folder nextAcc tl
         
-        interface IFolderAcceptor<QuickHList<'hd->'tl>> with
+        interface IFolderVisitable<QuickHList<'hd->'tl>> with
             member x.Accept (folder, acc, elem) = ConsAcceptor<'hd,'tl>.Accept(folder, acc, elem)
 
     end
@@ -90,7 +90,7 @@ module QuickHLists = begin
             { 
                 I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); 
                 I.TailAcceptor = tl.Acceptor;
-                I.Item = UntypedItems.ofTyped hd
+                I.Item = BoxedValues.ofTyped hd
             }
         in
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>() in

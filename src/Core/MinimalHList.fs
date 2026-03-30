@@ -6,7 +6,7 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal MinimalHListItem = { TailDeconsHandle: nativeint; Item: UntypedItem }
+type internal MinimalHListItem = { TailDeconsHandle: nativeint; Item: BoxedValue }
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
@@ -30,14 +30,14 @@ module MinimalHLists = begin
                 match c.Items with
                 | [] -> failwith "Unreachable"
                 | { TailDeconsHandle = tlHandle; Item = hdItem }::tlItems -> 
-                    let hd = UntypedItems.unsafeToTyped<'hd> hdItem
+                    let hd = BoxedValues.unsafeToTyped<'hd> hdItem
                     let tl = { L.DeconsHandle = HandleTheory.UnsafeFromIntPtr<_>(tlHandle); L.Items = tlItems }
                     System.ValueTuple<_,_>( hd, tl )
 
     end
 
     let cons (hd: 'hd) (tl: MinimalHList<'tl>) : MinimalHList<'hd -> 'tl> =
-        let hdItem = { I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); I.Item = UntypedItems.ofTyped hd }
+        let hdItem = { I.TailDeconsHandle = tl.DeconsHandle.ToIntPtr(); I.Item = BoxedValues.ofTyped hd }
         let deconsHandle = Deconstructor<'hd,'tl>.ToHandle().ToBoxedHandle<'hd -> 'tl>()
         { DeconsHandle = deconsHandle; Items = hdItem::tl.Items }
     

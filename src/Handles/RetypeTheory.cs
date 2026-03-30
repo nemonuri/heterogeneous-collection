@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Nemonuri.Handles;
 
-internal static class RetypeTheory
+public static class RetypeTheory
 {
     public static TTo UnsafeRetype<TFrom, TTo>(scoped ref readonly TFrom from)
     {

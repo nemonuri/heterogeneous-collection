@@ -9,25 +9,26 @@ public interface IFolder<TState>
 
 public interface IFolderVisitable {}
 
-public interface IFolderVisitable<TContext> : IFolderVisitable
+public interface IFolderVisitable<TElem> : IFolderVisitable
 {
-    IFolderAcceptor Acceptor {get;}
-}
-
-public interface IFolderAcceptor {}
-
-public interface IFolderAcceptor<T> : IFolderAcceptor
-{
-    TState Accept<TState>(IFolder<TState> folder, TState acc, T elem);
+    TState Accept<TState>(IFolder<TState> folder, TState acc, TElem elem);
 }
 
 
-public interface IOptimizedFolderAcceptor
+public interface IInRefFolder<TState>
 {
-    TState Accept<TState, T>(IFolder<TState> folder, TState acc, T elem);
+    TState Step<T>(in TState acc, in T elem);
+}
+
+public interface IInRefFolderVisitable {}
+
+public interface IInRefFolderVisitable<TElem> : IInRefFolderVisitable
+{
+    TState Accept<TState>(IInRefFolder<TState> folder, in TState acc, in TElem elem);
 }
 
 
+#if false
 public static class FolderTheory
 {
     public static bool TrySpecialize<TContext>
@@ -48,3 +49,4 @@ public static class FolderTheory
         return (result = marker as IFolderAcceptor<T>) is not null;
     }
 }
+#endif

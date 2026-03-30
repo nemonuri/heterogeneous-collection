@@ -15,7 +15,7 @@ type MinimalHUnion<'TContext> =
     internal { 
         DeconsHandle: BoxedDeconstructorHandle<'TContext, MinimalHUnion<'TContext>>; 
         Items: MinimalHUnionItem list;
-        Witness: UntypedItem;
+        Witness: BoxedValue;
         WitnessedContext: RuntimeTypeHandle
     }
 
@@ -29,7 +29,7 @@ module MinimalHUnions = begin
         {
             DeconsHandle = Unchecked.defaultof<_>;
             Items = [];
-            Witness = UntypedItems.ofTyped hd;
+            Witness = BoxedValues.ofTyped hd;
             WitnessedContext = TypeHandles.ofType<'hd->'tl>.Value
         }
     
@@ -57,7 +57,7 @@ module MinimalHUnions = begin
 
     let split (l: MinimalHUnion<'hd->'tl>) : Result<'hd,MinimalHUnion<'tl>> =
         if witnessIndex l = 0 then
-            UntypedItems.unsafeToTyped l.Witness |> Ok
+            BoxedValues.unsafeToTyped l.Witness |> Ok
         else
             let dhnd = l.DeconsHandle.UnsafeToUnboxedHandle<'hd,unit,'tl,MinimalHUnion<'tl>>()
             let struct ( _, tlc) = dhnd.Deconstruct(l)

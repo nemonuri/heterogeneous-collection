@@ -4,6 +4,7 @@ open System
 open System.Runtime.CompilerServices
 open Nemonuri.Collections.Heterogeneous.Primitives
 
+#if false
 module Folders = begin
 
     let trySpecializeVisitableV<'ctx> (x: IFolderVisitable) = 
@@ -19,31 +20,31 @@ module Folders = begin
     let specializeAcceptor<'a> x = trySpecializeAcceptorV<'a> x |> ValueOption.get
 
 end
-
+#endif
 
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type internal UntypedItem =
+type internal BoxedValue =
 | Primitive of p: int64
 | Object of o: obj
 
-module internal UntypedItems = begin
+module internal BoxedValues = begin
 
-    let ofTyped (x: 'a) : UntypedItem =
+    let ofTyped (x: 'a) : BoxedValue =
         if typeof<'a>.IsPrimitive && sizeof<'a> <= sizeof<int64> then
             let mutable v : int64 = 0L
             Unsafe.WriteUnaligned(&Unsafe.As<_,_>(&v), x)
-            v |> UntypedItem.Primitive
+            v |> BoxedValue.Primitive
         else
-            box x |> UntypedItem.Object
+            box x |> BoxedValue.Object
     
-    let unsafeToTyped<'a> (item: UntypedItem) : 'a =
+    let unsafeToTyped<'a> (item: BoxedValue) : 'a =
         match item with
-        | UntypedItem.Primitive p -> 
+        | BoxedValue.Primitive p -> 
             let mutable v = p
             Unsafe.ReadUnaligned<'a>(&Unsafe.As<_,_>(&v))
-        | UntypedItem.Object o -> unbox o
+        | BoxedValue.Object o -> unbox o
 
 end
 
