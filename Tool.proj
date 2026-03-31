@@ -1,8 +1,6 @@
 <Project Sdk="Microsoft.Build.NoTargets">
   <PropertyGroup>
     <TargetFramework>$(ToolTargetFramework)</TargetFramework>
-    
-    <BenchmarkProject>$(BenchmarkRootPath)HList.Heavy/HList.Heavy.fsproj</BenchmarkProject>
   </PropertyGroup>
   
   <ItemGroup>
