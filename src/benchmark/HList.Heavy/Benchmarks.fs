@@ -13,7 +13,7 @@ open BenchmarkDotNet.Diagnostics.Windows.Configs
 
 //[<EtwProfiler>]
 [<MemoryDiagnoser>]
-[<InliningDiagnoser(true,true); TailCallDiagnoser; DisassemblyDiagnoser>]
+[<InliningDiagnoser(false,false); TailCallDiagnoser(false,false); DisassemblyDiagnoser>]
 [<ShortRunJob(RuntimeMoniker.Net10_0)>]
 type Benchmarks () =
 
@@ -27,9 +27,6 @@ type Benchmarks () =
         { new IFolder<int> with member _.Step (acc: int, elem: 'T): int = foldImpl acc elem }
 
     let foldRefImpl (acc: inref<int>) (x: inref<'a>) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
-
-    let pureFolder : IInRefFolder<int> = 
-        { new IInRefFolder<int> with member _.Step (acc, elem): int = foldRefImpl &acc &elem }
     
     let guardValueIs5 (n: int) : int = if n = 5 then n else failwithf "%d" n
 
