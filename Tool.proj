@@ -1,3 +1,28 @@
 <Project Sdk="Microsoft.Build.NoTargets">
+  <PropertyGroup>
+    <TargetFramework>$(ToolTargetFramework)</TargetFramework>
+    
+    <BenchmarkProject>$(BenchmarkRootPath)HList.Heavy/HList.Heavy.fsproj</BenchmarkProject>
+  </PropertyGroup>
   
+  <ItemGroup>
+    <MainBuildProjects Include="$(SrcRootPath)**/*.*proj" />
+    <MainBuildProjects Remove="**/test/**/*.*" />
+    <MainBuildProjects Remove="$(BenchmarkRootPath)**/*.*" />
+  </ItemGroup>
+  
+  <Target Name="MainBuild" AfterTargets="Build">
+    <MSBuild
+      Projects="@(MainBuildProjects)"
+      Targets="Build" />
+  </Target>
+  
+  <Target Name="Benchmark" Condition="Exists('$(BenchmarkProject)')">
+    <Exec
+      Command="dotnet run --project &quot;$(BenchmarkProject)&quot; -c Release -f net10.0"
+      WorkingDirectory="$([System.IO.Directory]::GetParent('$(BenchmarkProject)'))"
+      StandardOutputImportance="High"
+      StandardErrorImportance="High"
+      IgnoreExitCode="true" />
+  </Target>
 </Project>

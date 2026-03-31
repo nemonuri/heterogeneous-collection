@@ -4,7 +4,10 @@
     <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(RepoRootPath)artifacts/</ArtifactsPath>
+    <SrcRootPath>$(RepoRootPath)src/</SrcRootPath>
+    <BenchmarkRootPath>$(SrcRootPath)benchmark/</BenchmarkRootPath>
 
     <RepoTargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</RepoTargetFrameworks>
+    <ToolTargetFramework>netstandard2.0</ToolTargetFramework>
   </PropertyGroup>
 </Project>

@@ -6,12 +6,12 @@ open HList.Heavy
 
 [<EntryPoint>]
 let main argv =
-    let isEtwMode = argv |> Array.exists  (fun s -> s.Contains("ETW", StringComparison.InvariantCulture))
+    let isEtwMode = 
 #if false
-        Array.windowed 2 argv 
-        |> Array.map (fun ary -> (ary[0], ary[2]) )
-        |> Array.exists (fun pair -> pair = ("-p", "ETW") || pair = ("--profiler", "ETW"))   
+        argv 
+        |> Array.exists  (fun s -> s.Contains("ETW", StringComparison.InvariantCulture))
 #endif
+        false
 
     let config : IConfig = 
         match isEtwMode with

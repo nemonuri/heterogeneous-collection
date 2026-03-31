@@ -14,8 +14,9 @@ open BenchmarkDotNet.Diagnostics.Windows.Configs
 //[<EtwProfiler>]
 [<MemoryDiagnoser>]
 [<DisassemblyDiagnoser(maxDepth = 2, exportGithubMarkdown = false, exportHtml = true, exportCombinedDisassemblyReport = true)>]
-[<MediumRunJob(RuntimeMoniker.Net10_0)>]
-[<MediumRunJob(RuntimeMoniker.Net80)>]
+[<ShortRunJob(RuntimeMoniker.Net10_0)>]
+[<ShortRunJob(RuntimeMoniker.Net80)>]
+[<ShortRunJob(RuntimeMoniker.Net472)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
