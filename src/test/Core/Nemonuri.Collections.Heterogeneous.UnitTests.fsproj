@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Nemonuri.Collections.Heterogeneous.Core.fsproj" />
+    <ProjectReference Include="..\..\Core\Nemonuri.Collections.Heterogeneous.fsproj" />
   </ItemGroup>
 
 </Project>

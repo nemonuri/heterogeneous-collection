@@ -26,7 +26,7 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Nemonuri.Collections.Heterogeneous.Core.fsproj" />
+    <ProjectReference Include="..\..\Core\Nemonuri.Collections.Heterogeneous.fsproj" />
     <PackageReference Include="HeterogeneousCollections" />
     <PackageReference Include="FSharp.Core"/>
   </ItemGroup>
