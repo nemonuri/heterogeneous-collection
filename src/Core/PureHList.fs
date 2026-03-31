@@ -44,6 +44,7 @@ module PureHLists = begin
         | _ -> acc
             
 
+    [<NoEquality; NoComparison; Sealed>]
     type private Visitable<'hd, 'tl> = class
 
         private new() = {}
