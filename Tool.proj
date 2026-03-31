@@ -14,13 +14,5 @@
       Projects="@(MainBuildProjects)"
       Targets="Build" />
   </Target>
-  
-  <Target Name="Benchmark" Condition="Exists('$(BenchmarkProject)')">
-    <Exec
-      Command="dotnet run --project &quot;$(BenchmarkProject)&quot; -c Release -f net10.0"
-      WorkingDirectory="$([System.IO.Directory]::GetParent('$(BenchmarkProject)'))"
-      StandardOutputImportance="High"
-      StandardErrorImportance="High"
-      IgnoreExitCode="true" />
-  </Target>
+
 </Project>
