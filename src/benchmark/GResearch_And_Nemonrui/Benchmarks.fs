@@ -1,4 +1,4 @@
-﻿module HList.Heavy 
+﻿module GResearch_And_Nemonrui
 
 open System
 open BenchmarkDotNet
@@ -11,9 +11,8 @@ open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
 open BenchmarkDotNet.Diagnostics.Windows.Configs
 
-//[<EtwProfiler>]
+
 [<MemoryDiagnoser>]
-[<DisassemblyDiagnoser(maxDepth = 2, exportGithubMarkdown = false, exportHtml = true, exportCombinedDisassemblyReport = true)>]
 [<ShortRunJob(RuntimeMoniker.Net10_0)>]
 [<ShortRunJob(RuntimeMoniker.Net80)>]
 [<ShortRunJob(RuntimeMoniker.Net472)>]
@@ -37,7 +36,7 @@ type Benchmarks () =
     [<Params((*1, 100,*) 10000)>]
     member val public FoldLoop:int = 1 with get,set
 
-    member _.mkHList() =
+    member _.mkGResearch() =
         HList.empty
         |> HList.cons 1
         |> HList.cons "Hello"
@@ -56,31 +55,31 @@ type Benchmarks () =
         |> HList.cons anonRecord
         |> HList.cons (ValueSome 3)
 
-    member _.mkPureHList() =
-        PureHLists.empty
-        |> PureHLists.cons 1
-        |> PureHLists.cons "Hello"
-        |> PureHLists.cons '.'
-        |> PureHLists.cons 3
-        |> PureHLists.cons 4.5
-        |> PureHLists.cons 0L
-        |> PureHLists.cons -7
-        |> PureHLists.cons 100u
-        |> PureHLists.cons struct (1, 2)
-        |> PureHLists.cons '5'B
-        |> PureHLists.cons ()
-        |> PureHLists.cons 8
-        |> PureHLists.cons DBNull.Value
-        |> PureHLists.cons 0
-        |> PureHLists.cons anonRecord
-        |> PureHLists.cons (ValueSome 3)
+    member _.mkNemonuri() =
+        HeterogeneousLists.empty
+        |> HeterogeneousLists.cons 1
+        |> HeterogeneousLists.cons "Hello"
+        |> HeterogeneousLists.cons '.'
+        |> HeterogeneousLists.cons 3
+        |> HeterogeneousLists.cons 4.5
+        |> HeterogeneousLists.cons 0L
+        |> HeterogeneousLists.cons -7
+        |> HeterogeneousLists.cons 100u
+        |> HeterogeneousLists.cons struct (1, 2)
+        |> HeterogeneousLists.cons '5'B
+        |> HeterogeneousLists.cons ()
+        |> HeterogeneousLists.cons 8
+        |> HeterogeneousLists.cons DBNull.Value
+        |> HeterogeneousLists.cons 0
+        |> HeterogeneousLists.cons anonRecord
+        |> HeterogeneousLists.cons (ValueSome 3)
 
     [<Benchmark(Baseline = true)>]
-    member this.HList() : int =
+    member this.GResearch() : int =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
-            this.mkHList()
+            this.mkGResearch()
             |> HList.fold hlistFolder 0
             |> guardValueIs5
         acc
@@ -90,7 +89,7 @@ type Benchmarks () =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
-            this.mkPureHList()
-            |> PureHLists.fold quickFolder 0
+            this.mkNemonuri()
+            |> HeterogeneousLists.fold quickFolder 0
             |> guardValueIs5
         acc

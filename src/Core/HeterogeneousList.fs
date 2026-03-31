@@ -1,5 +1,3 @@
-#nowarn "42"
-
 namespace Nemonuri.Collections.Heterogeneous
 
 open System
@@ -8,28 +6,28 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
-type PureHList<'TPred> =
+type HeterogeneousList<'TPred> =
     private
     | Empty
     | Cons of predecessor:'TPred * visitable:IFolderVisitable<'TPred>
 
-module PureHLists = begin
+module HeterogeneousLists = begin
 
     type private Nil = System.ValueTuple
 
-    type private Pair<'hd, 'tl> = System.ValueTuple<'hd, PureHList<'tl>>
+    type private Pair<'hd, 'tl> = System.ValueTuple<'hd, HeterogeneousList<'tl>>
 
 
-    let empty: PureHList<Nil> = PureHList.Empty
+    let empty: HeterogeneousList<Nil> = HeterogeneousList.Empty
 
-    let isEmpty (l: PureHList<_>) = l.IsEmpty
+    let isEmpty (l: HeterogeneousList<_>) = l.IsEmpty
 
-    let private tryPredV (l: PureHList<_>) =
+    let private tryPredV (l: HeterogeneousList<_>) =
         match l with
-        | PureHList.Empty -> ValueNone
-        | PureHList.Cons (pred, _) -> ValueSome pred
+        | HeterogeneousList.Empty -> ValueNone
+        | HeterogeneousList.Cons (pred, _) -> ValueSome pred
 
-    let private toPair (l: PureHList<Pair<'hd, 'tl>>) =
+    let private toPair (l: HeterogeneousList<Pair<'hd, 'tl>>) =
         match tryPredV l with
         | ValueNone -> failwith "Unreachable"
         | ValueSome pred -> pred
@@ -38,9 +36,9 @@ module PureHLists = begin
 
     let tail l = match toPair l with | struct (_, tl) -> tl
     
-    let private fold_core (folder: IFolder<'state>) (acc: 'state) (l: PureHList<'ctx>) =
+    let private fold_core (folder: IFolder<'state>) (acc: 'state) (l: HeterogeneousList<'ctx>) =
         match l with
-        | PureHList.Cons (ctx, visitable) -> visitable.Accept(folder, acc, ctx)
+        | HeterogeneousList.Cons (ctx, visitable) -> visitable.Accept(folder, acc, ctx)
         | _ -> acc
             
 
@@ -61,14 +59,13 @@ module PureHLists = begin
 
     end
 
-    let cons (hd: 'hd) (l: PureHList<'tl>) =
-        PureHList.Cons (struct (hd, l), Visitable<'hd,'tl>.Instance)
+    let cons (hd: 'hd) (l: HeterogeneousList<'tl>) =
+        HeterogeneousList.Cons (struct (hd, l), Visitable<'hd,'tl>.Instance)
 
     let fold folder seed l = fold_core folder seed l
 
     let private folderForLength = { new IFolder<int> with member _.Step (acc: int, _: 'T): int = acc + 1 }
 
     let length l = fold folderForLength 0 l
-
 
 end

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="MinimalHLists.fs" /><Compile Include="MinimalHUnions.fs" /><Compile Include="QuickHLists.fs" /><Compile Include="PureHLists.fs" />
+    <Compile Include="PureHLists.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,8 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
           Condition="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" />
   <PropertyGroup>
-    <BenchmarkProject>$(BenchmarkRootPath)HList.Heavy/HList.Heavy.fsproj</BenchmarkProject>
+    <BenchmarkProject>$(BenchmarkRootPath)GResearch_And_Nemonrui/GResearch_And_Nemonrui.fsproj</BenchmarkProject>
+    <TestProject>$(TestRootPath)Core/Nemonuri.Collections.Heterogeneous.UnitTests.fsproj</TestProject>
   </PropertyGroup>
+
 </Project>

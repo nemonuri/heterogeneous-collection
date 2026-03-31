@@ -2,7 +2,7 @@
 open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Running
 open BenchmarkDotNet.Diagnostics.Windows
-open HList.Heavy
+open GResearch_And_Nemonrui
 
 [<EntryPoint>]
 let main argv =

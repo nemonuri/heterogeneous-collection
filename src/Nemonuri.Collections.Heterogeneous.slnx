@@ -1,8 +1,6 @@
 <Solution>
   <Folder Name="/benchmark/">
-    <Project Path="benchmark/HList.ConsOnly/HList.ConsOnly.fsproj" />
-    <Project Path="benchmark/HList.Heavy/HList.Heavy.fsproj" />
-    <Project Path="benchmark/HList/HList.fsproj" />
+    <Project Path="benchmark/GResearch_And_Nemonrui/GResearch_And_Nemonrui.fsproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="Primitives/Nemonuri.Collections.Heterogeneous.Primitives.csproj" />

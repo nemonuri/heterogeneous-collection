@@ -1,10 +1,12 @@
-module Nemonuri.Collections.Heterogeneous.UnitTests.PureHLists
+#nowarn "42"
+
+module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
 
 open Xunit
 open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
-open Nemonuri.Collections.Heterogeneous.PureHLists
+open Nemonuri.Collections.Heterogeneous.HeterogeneousLists
 
 
 module private Fixtures = begin
@@ -23,11 +25,48 @@ module private Fixtures = begin
 
 end
 
+type Ty<'T> = struct end
+
+let ty<'a> = Ty<'a>()
+
+let private retype<'T,'U> (x:'T) : 'U = (# "" x : 'U #)
+
+let (|Type|_|) (_: Ty<'a>) (x: 'b) =
+    if typeof<'a> = typeof<'b> then
+        ValueSome (retype<'b,'a> x)
+    else
+        ValueNone
+
+
+let isLesserThan (n: int) (x: 'a) : bool =
+    let _int = ty<int> in
+    let _float = ty<float> in
+    let _string = ty<string> in
+    match x with
+    | Type _int v -> n < v
+    | Type _float v -> n < int v
+    | Type _string v -> 
+        let ok, r = System.Int32.TryParse(v) in
+        if ok then n < r else false
+    | _ -> false
+
+type IPredicate = interface
+
+    abstract member Invoke<'T>: 'T -> bool
+
+end
+
+let toIntFolder (p: IPredicate) = 
+    { new IFolder<int> with 
+        member _.Step (acc: int, elem: 'T): int = 
+            match p.Invoke(elem) with
+            | true -> acc + 1
+            | false -> acc }
 
 (* TODO: 좀 더 제대로 된 이름 짓기 *)
 [<Fact>]
 let Test1() =
-    let folder = QuickHLists.toIntFolder { new QuickHLists.IPredicate with member _.Invoke (x: 'T): bool = QuickHLists.isLesserThan 0 x } in
+    let folder = toIntFolder { new IPredicate with member _.Invoke (x: 'T): bool = isLesserThan 0 x } in
     let actual = fold folder 0 Fixtures.list1 in
     Assert.Equal(2, actual)
 

@@ -5,11 +5,9 @@
     <RootNamespace>Nemonuri.Collections.Heterogeneous</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Common.fs" />
-    <Compile Include="MinimalHList.fs" /><Compile Include="MinimalTypeList.fs" /><Compile Include="MinimalHUnion.fs" /><Compile Include="QuickHList.fs" /><Compile Include="PureHList.fs" />
+    <Compile Include="HeterogeneousList.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
-    <PackageReference Include="FSharp.Core" />
   </ItemGroup>
 </Project>

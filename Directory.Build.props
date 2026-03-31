@@ -6,6 +6,7 @@
     <ArtifactsPath>$(RepoRootPath)artifacts/</ArtifactsPath>
     <SrcRootPath>$(RepoRootPath)src/</SrcRootPath>
     <BenchmarkRootPath>$(SrcRootPath)benchmark/</BenchmarkRootPath>
+    <TestRootPath>$(SrcRootPath)test/</TestRootPath>
 
     <RepoTargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</RepoTargetFrameworks>
     <ToolTargetFramework>netstandard2.0</ToolTargetFramework>

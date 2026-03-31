@@ -1,6 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
-$benchmarkProject = & dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:BenchmarkProject
+& dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:BenchmarkProject |
+    Tee-Object -Variable benchmarkProject
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to get BenchmarkProject property."
