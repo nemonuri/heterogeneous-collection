@@ -13,8 +13,9 @@ open BenchmarkDotNet.Diagnostics.Windows.Configs
 
 //[<EtwProfiler>]
 [<MemoryDiagnoser>]
-[<InliningDiagnoser(false,false); TailCallDiagnoser(false,false); DisassemblyDiagnoser>]
-[<ShortRunJob(RuntimeMoniker.Net10_0)>]
+[<DisassemblyDiagnoser(maxDepth = 2, exportGithubMarkdown = false, exportHtml = true, exportCombinedDisassemblyReport = true)>]
+[<MediumRunJob(RuntimeMoniker.Net10_0)>]
+[<MediumRunJob(RuntimeMoniker.Net80)>]
 type Benchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
@@ -32,7 +33,7 @@ type Benchmarks () =
 
     static let anonRecord = {| Name = "John"; Age = 23 |}
 
-    [<Params(1, 100, 10000)>]
+    [<Params((*1, 100,*) 10000)>]
     member val public FoldLoop:int = 1 with get,set
 
     member _.mkHList() =
