@@ -1,4 +1,4 @@
-﻿module GResearch_And_Nemonrui
+﻿namespace GResearch_And_Nemonrui
 
 open System
 open BenchmarkDotNet
@@ -12,11 +12,11 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 open BenchmarkDotNet.Diagnostics.Windows.Configs
 
 
-[<MemoryDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser>]
 [<ShortRunJob(RuntimeMoniker.Net10_0)>]
 [<ShortRunJob(RuntimeMoniker.Net80)>]
 [<ShortRunJob(RuntimeMoniker.Net472)>]
-type Benchmarks () =
+type HeterogeneousListBenchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
 
