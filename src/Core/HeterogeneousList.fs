@@ -1,7 +1,5 @@
 namespace Nemonuri.Collections.Heterogeneous
 
-open System
-open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
