@@ -3,48 +3,52 @@ namespace Nemonuri.Collections.Heterogeneous
 open System
 open Nemonuri.Collections.Heterogeneous.Primitives
 
-#if false
-module private TypeListBasics = begin
-
-
-    type IPredecessor<'TTail> = interface
-
-        abstract member GetHead: unit -> Type
-
-        abstract member GetTail: unit -> 'TTail
-
-    end
-
-
-    type ISingletonProxy<'T> = interface
-
-        abstract member GetSingleton: unit -> 'T
-
-    end
-
-
-end
-
-
-module B = TypeListBasics
-#endif
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type TypeList<'TPred> = private { Pred: B.ISingletonProxy<'TPred> }
+type TypeList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 'TPred }
 
 
-module TypeLists = begin
+module TypeLists = begin   
 
-    type private Nil = System.ValueTuple
+    type Empty() = class
 
-    [<RequireQualifiedAccess>]
-    [<NoEquality; NoComparison; Struct>]
-    type Pair<'hd, 'pred> = private { TypeList: TypeList<'pred> }
+        static member internal Instance = Empty()
+
+        static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
+
+        interface IFolderVisitable<Empty> with
+            member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
+
+    end
+
+    let empty: TypeList<Empty> = { Pred = Empty.Instance }
+
+    let isEmpty (l: TypeList<'a>) = typeof<'a> = typeof<Empty>
+
+    let private fold_core folder acc (l: TypeList<_>) = l.Pred.Accept(folder, acc, l.Pred)
+
+    [<NoEquality; NoComparison>]
+    type Pair<'hd, 'pred 
+                when 'pred : (new: unit -> 'pred)
+                and 'pred :> IFolderVisitable<'pred>>() = class  //private { TypeList: TypeList<'pred> } 
+
+        let typeList: TypeList<'pred> = { TypeList.Pred = new 'pred() }
+
+        member x.TypeList = typeList
+
+        static member internal Instance = Pair<'hd, 'pred>()
+
+        static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
+            let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
+            elem.TypeList |> fold_core folder newAcc
+
+        interface IFolderVisitable<Pair<'hd, 'pred>> with
+            member _.Accept (folder, acc, elem) = Pair<'hd, 'pred>.Accept(folder, acc, elem)
+
+    end
 
     module private Pairs = begin
-
-        let toPair<'hd, 'pred> (tl: TypeList<'pred>) = { Pair.TypeList = tl }
 
         let head (pair: Pair<'hd,_>) = typeof<'hd>
 
@@ -53,28 +57,11 @@ module TypeLists = begin
     end
 
 
-    [<NoEquality; NoComparison>]
-    type private NilProxy = struct
-
-        static member Instance : B.ISingletonProxy<Nil> = NilProxy()
-
-        static member NilSingleton = Nil()
-
-        interface B.ISingletonProxy<Nil> with
-
-            member _.GetSingleton () = NilProxy.NilSingleton
-
-    end
-
-    let empty = { TypeList.Pred = NilProxy.Instance }
-
-    let isEmpty (l: TypeList<'a>) = typeof<'a> = typeof<Nil>
-
     let private tryPredV (l: TypeList<_>) =
         if isEmpty l then
             ValueNone
         else
-            l.Pred.GetSingleton() |> ValueSome
+            l.Pred |> ValueSome
     
     let private toPair (l: TypeList<Pair<'hd, 'tl>>) =
         match tryPredV l with
@@ -85,54 +72,14 @@ module TypeLists = begin
 
     let tail l = toPair l |> Pairs.tail
 
-#if false
-    [<NoEquality; NoComparison>]
-    type private TypeListProxy<'TPred, 'TPredProxy
-                                when 'TPredProxy :> B.ISingletonProxy<'TPred> 
-                                and 'TPredProxy : unmanaged > = struct
+    let cons<'hd, 'pred
+                when 'pred : (new: unit -> 'pred)
+                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) = { TypeList.Pred = Pair<'hd, 'pred>.Instance }
+    
+    let fold folder acc l = fold_core folder acc l
 
-        static member Instance : TypeList<'TPred> = { Pred = Unchecked.defaultof<'TPredProxy> }
+    let private folderForLength = { new IFolder<int> with member _.Step (acc: int, _: 'T): int = acc + 1 }
 
-        interface B.ISingletonProxy<TypeList<'TPred>> with
-            member _.GetSingleton () = TypeListProxy<'TPred, 'TPredProxy>.Instance
-
-    end
-
-    [<NoEquality; NoComparison>]
-    type private PairProxy<'THead, 'TPred, 'TPredProxy
-                            when 'TPredProxy :> B.ISingletonProxy<'TPred>
-                            and 'TPredProxy : unmanaged > = struct
-
-        static member Instance : B.ISingletonProxy<Pair<'THead, 'TPred>> = PairProxy<'THead, 'TPred, 'TPredProxy>()
-
-        static member PairSingleton : Pair<'THead, 'TPred> = TypeListProxy<'TPred, 'TPredProxy>.Instance |> Pairs.toPair<'THead,_>
-
-
-        interface B.ISingletonProxy<Pair<'THead, 'TPred>> with
-
-            member _.GetSingleton (): Pair<'THead,'TPred> = PairProxy<'THead, 'TPred, 'TPredProxy>.PairSingleton
-                    
-
-    end
-#endif
-
-    [<NoEquality; NoComparison>]
-    type private PairProxy<'THead, 'TPred when 'TPred : (new:unit -> 'TPred)> = struct
-
-        static member Instance : B.ISingletonProxy<Pair<'THead, 'TPred>> = PairProxy<'THead, 'TPred>()
-
-        interface B.ISingletonProxy<Pair<'THead, 'TPred>> with
-
-            member _.GetSingleton (): Pair<'THead,'TPred> = PairProxy<'THead, 'TPred, 'TPredProxy>.PairSingleton
-
-    end
-
-
-    let cons<'hd, 'pred> (tl: TypeList<'pred>) : TypeList<Pair<'hd, 'pred>> =
-        let pair = Pairs.toPair<'hd, 'pred> tl
-
-
+    let length l = fold folderForLength 0 l
 
 end
-
-
