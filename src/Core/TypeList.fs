@@ -11,9 +11,11 @@ type TypeList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 
 
 module TypeLists = begin   
 
-    type Empty() = class
+    open Unchecked
 
-        static member internal Instance = Empty()
+    type Empty = struct
+
+        //static member internal Instance = Empty()
 
         static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
 
@@ -22,7 +24,7 @@ module TypeLists = begin
 
     end
 
-    let empty: TypeList<Empty> = { Pred = Empty.Instance }
+    let empty: TypeList<Empty> = { Pred = defaultof<_> }
 
     let isEmpty (l: TypeList<'a>) = typeof<'a> = typeof<Empty>
 
@@ -30,14 +32,10 @@ module TypeLists = begin
 
     [<NoEquality; NoComparison>]
     type Pair<'hd, 'pred 
-                when 'pred : (new: unit -> 'pred)
-                and 'pred :> IFolderVisitable<'pred>>() = class  //private { TypeList: TypeList<'pred> } 
+                when 'pred : unmanaged
+                and 'pred :> IFolderVisitable<'pred>> = struct  //private { TypeList: TypeList<'pred> } 
 
-        let typeList: TypeList<'pred> = { TypeList.Pred = new 'pred() }
-
-        member x.TypeList = typeList
-
-        static member internal Instance = Pair<'hd, 'pred>()
+        member x.TypeList = { TypeList.Pred = defaultof<'pred> }
 
         static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
             let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
@@ -73,8 +71,8 @@ module TypeLists = begin
     let tail l = toPair l |> Pairs.tail
 
     let cons<'hd, 'pred
-                when 'pred : (new: unit -> 'pred)
-                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) = { TypeList.Pred = Pair<'hd, 'pred>.Instance }
+                when 'pred : unmanaged
+                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) = { TypeList.Pred = Pair<'hd,'pred>() }
     
     let fold folder acc l = fold_core folder acc l
 
