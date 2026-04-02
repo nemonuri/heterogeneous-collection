@@ -13,11 +13,10 @@ module TypeLists = begin
 
     open Unchecked
 
+    [<NoEquality; NoComparison>]
     type Empty = struct
 
-        //static member internal Instance = Empty()
-
-        static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
+        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
 
         interface IFolderVisitable<Empty> with
             member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
@@ -37,7 +36,7 @@ module TypeLists = begin
 
         member internal x.Tail = { TypeList.Pred = defaultof<'pred> }
 
-        static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
+        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
             let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
             elem.Tail |> fold_core folder newAcc
 
