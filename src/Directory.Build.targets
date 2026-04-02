@@ -1,9 +1,9 @@
 <Project>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0' and 'false'">
-        <PublishAot>true</PublishAot>
-        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-        <SelfContained>true</SelfContained>
-    </PropertyGroup>
+  <PropertyGroup Label="Nuget">
+    <PackageId>$(AssemblyName)</PackageId>
+    <Title>$(AssemblyName)</Title>
+    <Product>$(AssemblyName)</Product>
+  </PropertyGroup>
 
 </Project>

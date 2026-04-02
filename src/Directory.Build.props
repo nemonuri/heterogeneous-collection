@@ -1,0 +1,33 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+          Condition="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" />
+
+  <Import Project="$(ResRootPath)Version.props" />
+  <PropertyGroup Label="Nuget">
+
+    <Authors>Nemonuri</Authors>
+    <Company>Nemonuri</Company>
+    <Description>Type-safe heterogeneous collections.</Description>
+    <Copyright>© Nemonuri. All rights reserved.</Copyright>
+    
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/nemonuri/heterogeneous-collection</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/nemonuri/brand/refs/heads/main/icon/nemonuri_icon_128x128.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageTags>heterogeneous heterogeneous-list</PackageTags>
+    
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/nemonuri/heterogeneous-collection</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget">
+    <None Include="$(ResRootPath)icon.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+  
+</Project>

@@ -5,6 +5,7 @@
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(RepoRootPath)artifacts/</ArtifactsPath>
     <SrcRootPath>$(RepoRootPath)src/</SrcRootPath>
+    <ResRootPath>$(RepoRootPath)res/</ResRootPath>
     <BenchmarkRootPath>$(SrcRootPath)benchmark/</BenchmarkRootPath>
     <TestRootPath>$(SrcRootPath)test/</TestRootPath>
 

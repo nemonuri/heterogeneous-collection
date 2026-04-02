@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.Build.NoTargets">
   <PropertyGroup>
     <TargetFramework>$(ToolTargetFramework)</TargetFramework>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   
   <ItemGroup>
@@ -13,6 +14,13 @@
     <MSBuild
       Projects="@(MainBuildProjects)"
       Targets="Build" />
+  </Target>
+  
+  <Target Name="MainPack" AfterTargets="Pack">
+    <MSBuild
+      Projects="@(MainBuildProjects)"
+      Targets="Pack"
+      Properties="Configuration=Release;Optimize=true" />
   </Target>
 
 </Project>

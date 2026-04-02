@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup Label="Nuget">
+    <Version>0.0.100-preview.1</Version>
+    <PackageReleaseNotes>First release.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget">
+    <None
+      Include="$(RepoRootPath)readme.md" Pack="true"
+      PackagePath="./readme.md" Visible="false" />
+  </ItemGroup>
+</Project>

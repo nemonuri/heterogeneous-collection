@@ -10,4 +10,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   
+  <PropertyGroup Label="Nuget">
+    <Description>Primitives for $(Description)</Description>
+  </PropertyGroup>
+  
 </Project>
