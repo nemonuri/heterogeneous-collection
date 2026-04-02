@@ -51,7 +51,7 @@ type HeterogeneousListBenchmarks () =
         |> HList.cons anonRecord
         |> HList.cons (ValueSome 3)
 
-    member _.mkNemonuri_old() =
+    member _.mkNemonuri() =
         HeterogeneousLists.empty
         |> HeterogeneousLists.cons 1
         |> HeterogeneousLists.cons "Hello"
@@ -86,7 +86,7 @@ type HeterogeneousListBenchmarks () =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
-            this.mkNemonuri_old()
+            this.mkNemonuri()
             |> HeterogeneousLists.fold nFolder 0
             |> guardValueIs5
         acc
