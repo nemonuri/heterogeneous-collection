@@ -35,11 +35,11 @@ module TypeLists = begin
                 when 'pred : unmanaged
                 and 'pred :> IFolderVisitable<'pred>> = struct  //private { TypeList: TypeList<'pred> } 
 
-        member x.TypeList = { TypeList.Pred = defaultof<'pred> }
+        member internal x.Tail = { TypeList.Pred = defaultof<'pred> }
 
         static member Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
             let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
-            elem.TypeList |> fold_core folder newAcc
+            elem.Tail |> fold_core folder newAcc
 
         interface IFolderVisitable<Pair<'hd, 'pred>> with
             member _.Accept (folder, acc, elem) = Pair<'hd, 'pred>.Accept(folder, acc, elem)
@@ -50,7 +50,7 @@ module TypeLists = begin
 
         let head (pair: Pair<'hd,_>) = typeof<'hd>
 
-        let tail (pair: Pair<_,_>) = pair.TypeList
+        let tail (pair: Pair<_,_>) = pair.Tail
 
     end
 
