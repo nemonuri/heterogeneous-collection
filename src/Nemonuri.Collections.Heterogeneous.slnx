@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/benchmark/">
-    <Project Path="benchmark/GResearch_And_Nemonrui/GResearch_And_Nemonrui.fsproj" />
+    <Project Path="benchmark/GResearch_And_Nemonuri/GResearch_And_Nemonuri.fsproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="Primitives/Nemonuri.Collections.Heterogeneous.Primitives.csproj" />

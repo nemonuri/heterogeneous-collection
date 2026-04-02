@@ -1,15 +1,11 @@
 ﻿namespace GResearch_And_Nemonrui
 
 open System
-open BenchmarkDotNet
-open BenchmarkDotNet
 open BenchmarkDotNet.Jobs
-open BenchmarkDotNet.Engines
 open BenchmarkDotNet.Attributes
 open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
-open BenchmarkDotNet.Diagnostics.Windows.Configs
 
 
 [<MemoryDiagnoser; DisassemblyDiagnoser>]
@@ -33,8 +29,8 @@ type HeterogeneousListBenchmarks () =
 
     static let anonRecord = {| Name = "John"; Age = 23 |}
 
-    [<Params((*1, 100,*) 10000)>]
-    member val public FoldLoop:int = 1 with get,set
+    // [<Params(1, 100, 10000)>]
+    member val public FoldLoop:int = 10000 with get,set
 
     member _.mkGResearch() =
         HList.empty
@@ -74,24 +70,6 @@ type HeterogeneousListBenchmarks () =
         |> HeterogeneousLists.cons anonRecord
         |> HeterogeneousLists.cons (ValueSome 3)
 
-    member _.mkNemonuri_new() =
-        HeterogeneousLists2.empty
-        |> HeterogeneousLists2.cons 1
-        |> HeterogeneousLists2.cons "Hello"
-        |> HeterogeneousLists2.cons '.'
-        |> HeterogeneousLists2.cons 3
-        |> HeterogeneousLists2.cons 4.5
-        |> HeterogeneousLists2.cons 0L
-        |> HeterogeneousLists2.cons -7
-        |> HeterogeneousLists2.cons 100u
-        |> HeterogeneousLists2.cons struct (1, 2)
-        |> HeterogeneousLists2.cons '5'B
-        |> HeterogeneousLists2.cons ()
-        |> HeterogeneousLists2.cons 8
-        |> HeterogeneousLists2.cons DBNull.Value
-        |> HeterogeneousLists2.cons 0
-        |> HeterogeneousLists2.cons anonRecord
-        |> HeterogeneousLists2.cons (ValueSome 3)
 
     [<Benchmark(Baseline = true)>]
     member this.GResearch() : int =
@@ -104,21 +82,11 @@ type HeterogeneousListBenchmarks () =
         acc
 
     [<Benchmark>]
-    member this.Nemonuri_Old() : int =
+    member this.Nemonuri() : int =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
             this.mkNemonuri_old()
             |> HeterogeneousLists.fold nFolder 0
-            |> guardValueIs5
-        acc
-
-    [<Benchmark>]
-    member this.Nemonuri_New() : int =
-        let mutable acc: int = 0
-        for i = 1 to this.FoldLoop do
-            acc <-
-            this.mkNemonuri_new()
-            |> HeterogeneousLists2.fold nFolder 0
             |> guardValueIs5
         acc

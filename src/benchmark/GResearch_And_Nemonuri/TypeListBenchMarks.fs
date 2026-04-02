@@ -1,15 +1,12 @@
 namespace GResearch_And_Nemonrui
 
 open System
-open BenchmarkDotNet
-open BenchmarkDotNet
 open BenchmarkDotNet.Jobs
-open BenchmarkDotNet.Engines
 open BenchmarkDotNet.Attributes
 open HCollections
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
-open BenchmarkDotNet.Diagnostics.Windows.Configs
+
 
 [<MemoryDiagnoser; DisassemblyDiagnoser>]
 [<ShortRunJob(RuntimeMoniker.Net10_0)>]
@@ -17,11 +14,10 @@ open BenchmarkDotNet.Diagnostics.Windows.Configs
 [<ShortRunJob(RuntimeMoniker.Net472)>]
 type TypeListBenchmarks () =
 
-    let nExpected = 
+    let expected = 
         [typeof<int>; typeof<string>; typeof<bool>; typeof<char>; typeof<uint32>;
-            typeof<int option>; typeof<obj>; typeof<unit>; typeof<int list>; typeof<int * string>]
+            typeof<int option>; typeof<obj>; typeof<unit>; typeof<int list>; typeof<int * string>] |> List.rev
 
-    let gExpected = nExpected |> List.rev
 
     let guardExpected (expected: Type list) (actual: Type list) =
         List.forall2 (fun t1 t2 -> t1 = t2) expected actual
@@ -31,7 +27,7 @@ type TypeListBenchmarks () =
 
     let nFolder = 
         { new IFolder<Type list> with
-            member _.Step (acc: Type list, elem: 'a): Type list = typeof<'a>::acc }
+            member _.Step (acc: Type list, elem: 'a): Type list = acc @ [typeof<'a>] }
 
     member _.mkGResearch() =
         TypeList.empty
@@ -63,10 +59,10 @@ type TypeListBenchmarks () =
     member this.GResearch() =
         this.mkGResearch()
         |> TypeList.toTypes
-        |> guardExpected gExpected
+        |> guardExpected expected
     
     [<Benchmark>]
     member this.Nemonuri() =
         this.mkNemonrui()
         |> TypeLists.fold nFolder []
-        |> guardExpected nExpected
+        |> guardExpected expected

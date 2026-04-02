@@ -4,66 +4,66 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
-type HeterogeneousList<'TPred> =
-    private
-    | Empty
-    | Cons of predecessor:'TPred * visitable:IFolderVisitable<'TPred>
+type HeterogeneousList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 'TPred }
+
 
 module HeterogeneousLists = begin
 
-    type private Nil = System.ValueTuple
+    [<NoEquality; NoComparison>]
+    type Empty = struct 
 
-    type private Pair<'hd, 'tl> = System.ValueTuple<'hd, HeterogeneousList<'tl>>
+        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
+
+        interface IFolderVisitable<Empty> with
+            member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
+
+    end
+
+    let empty: HeterogeneousList<Empty> = { Pred = Empty() }
+
+    let isEmpty (l: HeterogeneousList<'a>) = typeof<'a> = typeof<Empty>
 
 
-    let empty: HeterogeneousList<Nil> = HeterogeneousList.Empty
+    let private fold_core folder acc (l: HeterogeneousList<_>) = l.Pred.Accept(folder, acc, l.Pred)
 
-    let isEmpty (l: HeterogeneousList<_>) = l.IsEmpty
+    [<RequireQualifiedAccess>]
+    [<NoEquality; NoComparison; Struct>]
+    type Pair<'hd, 'pred when 'pred :> IFolderVisitable<'pred>> = private { Head: 'hd; Tail: HeterogeneousList<'pred> } with
+
+        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
+            let newAcc = folder.Step<'hd>(acc, elem.Head)
+            elem.Tail |> fold_core folder newAcc
+
+        interface IFolderVisitable<Pair<'hd, 'pred>> with
+            member _.Accept (folder, acc, elem) = Pair<'hd, 'pred>.Accept(folder, acc, elem)
+
+    end
 
     let private tryPredV (l: HeterogeneousList<_>) =
-        match l with
-        | HeterogeneousList.Empty -> ValueNone
-        | HeterogeneousList.Cons (pred, _) -> ValueSome pred
+        if isEmpty l then
+            ValueNone
+        else
+            l.Pred |> ValueSome
 
     let private toPair (l: HeterogeneousList<Pair<'hd, 'tl>>) =
         match tryPredV l with
         | ValueNone -> failwith "Unreachable"
         | ValueSome pred -> pred
+
+    let head l = toPair l |> _.Head
+
+    let tail l = toPair l |> _.Tail
     
-    let head l = match toPair l with | struct (hd, _) -> hd
-
-    let tail l = match toPair l with | struct (_, tl) -> tl
-    
-    let private fold_core (folder: IFolder<'state>) (acc: 'state) (l: HeterogeneousList<'ctx>) =
-        match l with
-        | HeterogeneousList.Cons (ctx, visitable) -> visitable.Accept(folder, acc, ctx)
-        | _ -> acc
-            
-
-    [<NoEquality; NoComparison; Sealed>]
-    type private Visitable<'hd, 'tl> = class
-
-        private new() = {}
-
-        static member Instance : Visitable<'hd, 'tl> = Visitable<_,_>()
-
-        static member Accept<'state> (folder: IFolder<'state>, acc: 'state, ctx: Pair<'hd,'tl>): 'state = 
-            let struct (hd, tl) = ctx in
-            let nextAcc = folder.Step<'hd>(acc, hd)
-            fold_core folder nextAcc tl
-
-        interface IFolderVisitable<Pair<'hd, 'tl>> with
-            member _.Accept (folder, acc, ctx) = Visitable<'hd, 'tl>.Accept(folder, acc, ctx)
-
-    end
 
     let cons (hd: 'hd) (l: HeterogeneousList<'tl>) =
-        HeterogeneousList.Cons (struct (hd, l), Visitable<'hd,'tl>.Instance)
+        let pred = { Pair.Head = hd; Pair.Tail = l; } in
+        { HeterogeneousList.Pred = pred }
 
     let fold folder seed l = fold_core folder seed l
 
     let private folderForLength = { new IFolder<int> with member _.Step (acc: int, _: 'T): int = acc + 1 }
 
     let length l = fold folderForLength 0 l
+
 
 end
