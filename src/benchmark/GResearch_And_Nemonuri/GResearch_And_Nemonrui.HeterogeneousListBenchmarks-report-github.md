@@ -13,11 +13,11 @@ IterationCount=3  LaunchCount=1  WarmupCount=3
 ```
 | Method    | Job                           | Runtime              | Mean      | Error     | StdDev    | Ratio | RatioSD | Code Size | Gen0      | Gen1    | Allocated | Alloc Ratio |
 |---------- |------------------------------ |--------------------- |----------:|----------:|----------:|------:|--------:|----------:|----------:|--------:|----------:|------------:|
-| GResearch | ShortRun-.NET 10.0            | .NET 10.0            |  7.755 ms | 0.2502 ms | 0.0137 ms |  1.00 |    0.00 |   2,494 B | 1890.6250 |       - |  28.38 MB |        1.00 |
-| Nemonuri  | ShortRun-.NET 10.0            | .NET 10.0            |  2.638 ms | 0.2478 ms | 0.0136 ms |  0.34 |    0.00 |   1,094 B |  324.2188 |       - |   4.88 MB |        0.17 |
+| GResearch | ShortRun-.NET 10.0            | .NET 10.0            |  7.614 ms | 0.9457 ms | 0.0518 ms |  1.00 |    0.01 |   2,494 B | 1890.6250 |       - |  28.38 MB |        1.00 |
+| Nemonuri  | ShortRun-.NET 10.0            | .NET 10.0            |  2.606 ms | 0.3753 ms | 0.0206 ms |  0.34 |    0.00 |   1,094 B |  324.2188 |       - |   4.88 MB |        0.17 |
 |           |                               |                      |           |           |           |       |         |           |           |         |           |             |
-| GResearch | ShortRun-.NET 8.0             | .NET 8.0             |  9.673 ms | 1.2413 ms | 0.0680 ms |  1.00 |    0.01 |   2,497 B | 1890.6250 |       - |  28.38 MB |        1.00 |
-| Nemonuri  | ShortRun-.NET 8.0             | .NET 8.0             |  3.374 ms | 0.2529 ms | 0.0139 ms |  0.35 |    0.00 |   1,077 B |  324.2188 |       - |   4.88 MB |        0.17 |
+| GResearch | ShortRun-.NET 8.0             | .NET 8.0             |  9.476 ms | 0.6518 ms | 0.0357 ms |  1.00 |    0.00 |   2,497 B | 1890.6250 |       - |  28.38 MB |        1.00 |
+| Nemonuri  | ShortRun-.NET 8.0             | .NET 8.0             |  3.306 ms | 0.3976 ms | 0.0218 ms |  0.35 |    0.00 |   1,077 B |  324.2188 |       - |   4.88 MB |        0.17 |
 |           |                               |                      |           |           |           |       |         |           |           |         |           |             |
-| GResearch | ShortRun-.NET Framework 4.7.2 | .NET Framework 4.7.2 | 11.182 ms | 0.4742 ms | 0.0260 ms |  1.00 |    0.00 |   1,075 B | 4734.3750 | 15.6250 |  28.46 MB |        1.00 |
-| Nemonuri  | ShortRun-.NET Framework 4.7.2 | .NET Framework 4.7.2 | 34.722 ms | 3.5110 ms | 0.1925 ms |  3.11 |    0.02 |   1,312 B |  800.0000 |       - |    4.9 MB |        0.17 |
+| GResearch | ShortRun-.NET Framework 4.7.2 | .NET Framework 4.7.2 | 11.295 ms | 2.2249 ms | 0.1220 ms |  1.00 |    0.01 |   1,075 B | 4734.3750 | 15.6250 |  28.46 MB |        1.00 |
+| Nemonuri  | ShortRun-.NET Framework 4.7.2 | .NET Framework 4.7.2 | 33.996 ms | 8.8564 ms | 0.4854 ms |  3.01 |    0.05 |   1,312 B |  800.0000 |       - |    4.9 MB |        0.17 |
