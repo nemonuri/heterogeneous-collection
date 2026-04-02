@@ -20,11 +20,11 @@ type HeterogeneousListBenchmarks () =
 
     let foldImpl (acc: int) (x: 'a) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
 
-    let hlistFolder : HListFolder<int> = 
+    let gFolder : HListFolder<int> = 
         { new HListFolder<int> with member _.Folder (acc: int) (x: 'a): int = foldImpl acc x }
 
     
-    let quickFolder : IFolder<int> = 
+    let nFolder : IFolder<int> = 
         { new IFolder<int> with member _.Step (acc: int, elem: 'T): int = foldImpl acc elem }
 
     let foldRefImpl (acc: inref<int>) (x: inref<'a>) : int = if typeof<'a> = typeof<int> then acc + 1 else acc
@@ -55,7 +55,7 @@ type HeterogeneousListBenchmarks () =
         |> HList.cons anonRecord
         |> HList.cons (ValueSome 3)
 
-    member _.mkNemonuri() =
+    member _.mkNemonuri_old() =
         HeterogeneousLists.empty
         |> HeterogeneousLists.cons 1
         |> HeterogeneousLists.cons "Hello"
@@ -74,22 +74,51 @@ type HeterogeneousListBenchmarks () =
         |> HeterogeneousLists.cons anonRecord
         |> HeterogeneousLists.cons (ValueSome 3)
 
+    member _.mkNemonuri_new() =
+        HeterogeneousLists2.empty
+        |> HeterogeneousLists2.cons 1
+        |> HeterogeneousLists2.cons "Hello"
+        |> HeterogeneousLists2.cons '.'
+        |> HeterogeneousLists2.cons 3
+        |> HeterogeneousLists2.cons 4.5
+        |> HeterogeneousLists2.cons 0L
+        |> HeterogeneousLists2.cons -7
+        |> HeterogeneousLists2.cons 100u
+        |> HeterogeneousLists2.cons struct (1, 2)
+        |> HeterogeneousLists2.cons '5'B
+        |> HeterogeneousLists2.cons ()
+        |> HeterogeneousLists2.cons 8
+        |> HeterogeneousLists2.cons DBNull.Value
+        |> HeterogeneousLists2.cons 0
+        |> HeterogeneousLists2.cons anonRecord
+        |> HeterogeneousLists2.cons (ValueSome 3)
+
     [<Benchmark(Baseline = true)>]
     member this.GResearch() : int =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
             this.mkGResearch()
-            |> HList.fold hlistFolder 0
+            |> HList.fold gFolder 0
             |> guardValueIs5
         acc
 
     [<Benchmark>]
-    member this.PureHLists() : int =
+    member this.Nemonuri_Old() : int =
         let mutable acc: int = 0
         for i = 1 to this.FoldLoop do
             acc <-
-            this.mkNemonuri()
-            |> HeterogeneousLists.fold quickFolder 0
+            this.mkNemonuri_old()
+            |> HeterogeneousLists.fold nFolder 0
+            |> guardValueIs5
+        acc
+
+    [<Benchmark>]
+    member this.Nemonuri_New() : int =
+        let mutable acc: int = 0
+        for i = 1 to this.FoldLoop do
+            acc <-
+            this.mkNemonuri_new()
+            |> HeterogeneousLists2.fold nFolder 0
             |> guardValueIs5
         acc
