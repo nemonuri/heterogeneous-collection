@@ -19,14 +19,6 @@ type DiffTypeListBenchMarks () =
         { new IFolder<Type list> with
             member _.Step (acc: Type list, elem: 'T): Type list = typeof<'T>::acc }
     
-    let mkList1() =
-        D.empty
-        |> D.cons<int,_,_>
-        |> D.cons<string,_,_>
-        |> D.cons<bool,_,_>
-        |> D.cons<char,_,_>
-        |> D.cons<uint32,_,_>
-
     let expected = [typeof<int>; typeof<string>; typeof<bool>; typeof<char>; typeof<uint32>] @ [typeof<float>; typeof<unit>; typeof<nativeint>]
 
     let guardExpected (expected: Type list) (actual: Type list) =
@@ -35,7 +27,15 @@ type DiffTypeListBenchMarks () =
             | true -> actual
             | false -> failwith "not expected"
 
-    static member mkList2<'a when 'a :> D.IPredecessor<'a> and 'a : unmanaged>() =
+    member _.mkList1() =
+        D.empty
+        |> D.cons<int,_,_>
+        |> D.cons<string,_,_>
+        |> D.cons<bool,_,_>
+        |> D.cons<char,_,_>
+        |> D.cons<uint32,_,_>
+
+    member _.mkList2<'a when 'a :> D.IPredecessor<'a> and 'a : unmanaged>() =
         D.create<'a>
         |> D.cons<float,_,_>
         |> D.cons<unit,_,_>
@@ -43,7 +43,7 @@ type DiffTypeListBenchMarks () =
     
     [<Benchmark>]
     member this.Nemonuri() =
-        mkList1()
-        |> D.append (DiffTypeListBenchMarks.mkList2<_>())
+        this.mkList1()
+        |> D.append (this.mkList2<_>())
         |> D.fold typeListFolder []
         |> guardExpected expected
