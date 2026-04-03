@@ -1,4 +1,15 @@
+
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $false, ValueFromRemainingArguments)]
+    [string[]] $ExtraArgs = @()
+)
+
 $ErrorActionPreference = 'Stop'
+
+if ($ExtraArgs.Length -gt 0) {
+    Write-Host "ExtraArgs = $($ExtraArgs -join " ")"
+}
 
 & dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:BenchmarkProject |
     Tee-Object -Variable benchmarkProject
@@ -13,9 +24,19 @@ if (-not (Test-Path $benchmarkProject -PathType Leaf)) {
     exit 1
 }
 
+#--- normalize extra args ---
+
+[string]$normalizedExtraArgs = ""
+
+if ($ExtraArgs.Length -gt 0) {
+    $normalizedExtraArgs = "-- $($ExtraArgs -join " ")"
+}
+
+#---|
+
 Push-Location (Join-Path $benchmarkProject "..")
 
 $benchmarkProject = [System.IO.Path]::GetFullPath($benchmarkProject)
-& dotnet run --project "$benchmarkProject" -c Release -f net10.0  2>&1
+& dotnet run --project "$benchmarkProject" -c Release -f net10.0 $normalizedExtraArgs  2>&1
 
 Pop-Location

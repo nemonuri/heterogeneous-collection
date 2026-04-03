@@ -1,5 +1,3 @@
-#nowarn "42"
-
 namespace Nemonuri.Collections.Heterogeneous
 
 open Nemonuri.Collections.Heterogeneous.Primitives
@@ -61,11 +59,11 @@ module DiffTypeLists = begin
                         when 'pred :> IPredecessor<'pred>
                         and 'pred : unmanaged> = 'pred
 
-    let assume<'anc
+    let create<'anc
                 when 'anc :> IPredecessor<'anc>
                 and 'anc : unmanaged> : DiffTypeList<'anc,'anc> = DiffTypeList.T   
     
-    let empty : DiffTypeList<Empty, Empty> = assume<Empty>
+    let empty : DiffTypeList<Empty, Empty> = create<Empty>
 
     let private toPred (l: DiffTypeList<Pred<'pred>, Pred<'anc>>) = defaultof<'pred>
 

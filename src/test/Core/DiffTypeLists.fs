@@ -24,7 +24,7 @@ module private Fixtures = begin
     let expected1 = [typeof<int>; typeof<string>; typeof<bool>; typeof<char>; typeof<uint32>]
 
     let list2<'a when 'a :> IPredecessor<'a> and 'a : unmanaged> =
-        assume<'a>
+        create<'a>
         |> cons<float,_,_>
         |> cons<unit,_,_>
         |> cons<nativeint,_,_>
