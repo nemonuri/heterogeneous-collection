@@ -57,15 +57,17 @@ module DiffTypeLists = begin
 
     end
 
+    type private Pred<'pred 
+                        when 'pred :> IPredecessor<'pred>
+                        and 'pred : unmanaged> = 'pred
+
     let assume<'anc
                 when 'anc :> IPredecessor<'anc>
                 and 'anc : unmanaged> : DiffTypeList<'anc,'anc> = DiffTypeList.T   
     
     let empty : DiffTypeList<Empty, Empty> = assume<Empty>
 
-    let private toPred<'pred, 'anc 
-                        when 'pred :> IPredecessor<'pred>
-                        and 'pred : unmanaged> (l: DiffTypeList<'pred, 'anc>) = defaultof<'pred>
+    let private toPred (l: DiffTypeList<Pred<'pred>, Pred<'anc>>) = defaultof<'pred>
 
     let isEmpty (l: DiffTypeList<'pred,'anc>) = (toPred l |> _.Length) = 0
 
@@ -97,9 +99,11 @@ module DiffTypeLists = begin
 
     let cons<'hd, 'pred, 'anc
                 when 'pred :> IPredecessor<'pred>
-                and 'pred : unmanaged> (tl: DiffTypeList<'pred, 'anc>) : DiffTypeList<Pair<'hd, 'pred>, 'anc> = DiffTypeList.T
+                and 'pred : unmanaged
+                and 'anc :> IPredecessor<'anc>
+                and 'anc : unmanaged> (tl: DiffTypeList<'pred, 'anc>) : DiffTypeList<Pair<'hd, 'pred>, 'anc> = DiffTypeList.T
 
-    let append (first: DiffTypeList<'pred, 'anc1>) (second: DiffTypeList<'anc1, 'anc2>) : DiffTypeList<'pred, 'anc2> = DiffTypeList.T
+    let append (first: DiffTypeList<'pred, Pred<'anc1>>) (second: DiffTypeList<'anc1, Pred<'anc2>>) : DiffTypeList<'pred, 'anc2> = DiffTypeList.T
 
     let private fold_core folder acc (l: DiffTypeList<_,_>) =
         let pred = toPred l in
