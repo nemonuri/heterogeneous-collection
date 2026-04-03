@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Nuget">
-    <Version>0.0.100-preview.1</Version>
+    <Version>0.0.100-preview.2</Version>
     <PackageReleaseNotes>First release.</PackageReleaseNotes>
   </PropertyGroup>
 

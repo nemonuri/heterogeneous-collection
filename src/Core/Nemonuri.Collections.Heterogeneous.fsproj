@@ -5,7 +5,7 @@
     <RootNamespace>Nemonuri.Collections.Heterogeneous</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="TypeList.fs" /><Compile Include="HeterogeneousList.fs" />
+    <Compile Include="TypeList.fs" /><Compile Include="DiffTypeList.fs" /><Compile Include="HeterogeneousList.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />

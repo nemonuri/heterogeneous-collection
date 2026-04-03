@@ -6,7 +6,7 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type TypeList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 'TPred }
+type TypeList<'TPred> = private | T //{ Pred: 'TPred }
 
 
 module TypeLists = begin   
@@ -23,18 +23,24 @@ module TypeLists = begin
 
     end
 
-    let empty: TypeList<Empty> = { Pred = defaultof<_> }
+    let empty: TypeList<Empty> = TypeList.T
 
     let isEmpty (l: TypeList<'a>) = typeof<'a> = typeof<Empty>
 
-    let private fold_core folder acc (l: TypeList<_>) = l.Pred.Accept(folder, acc, l.Pred)
+    let private toPred<'pred 
+                        when 'pred :> IFolderVisitable<'pred>
+                        and 'pred : unmanaged> (l: TypeList<'pred>) = defaultof<'pred>
+
+    let private fold_core folder acc (l: TypeList<_>) =
+        let pred = toPred l in
+        pred.Accept(folder, acc, pred)
 
     [<NoEquality; NoComparison>]
     type Pair<'hd, 'pred 
                 when 'pred : unmanaged
                 and 'pred :> IFolderVisitable<'pred>> = struct  //private { TypeList: TypeList<'pred> } 
 
-        member internal x.Tail = { TypeList.Pred = defaultof<'pred> }
+        member internal x.Tail : TypeList<'pred> = TypeList.T
 
         static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
             let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
@@ -58,7 +64,7 @@ module TypeLists = begin
         if isEmpty l then
             ValueNone
         else
-            l.Pred |> ValueSome
+            (toPred l) |> ValueSome
     
     let private toPair (l: TypeList<Pair<'hd, 'tl>>) =
         match tryPredV l with
@@ -71,7 +77,7 @@ module TypeLists = begin
 
     let cons<'hd, 'pred
                 when 'pred : unmanaged
-                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) = { TypeList.Pred = Pair<'hd,'pred>() }
+                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) : TypeList<Pair<'hd,'pred>> = TypeList.T
     
     let fold folder acc l = fold_core folder acc l
 

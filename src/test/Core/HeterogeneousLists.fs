@@ -3,7 +3,6 @@
 module Nemonuri.Collections.Heterogeneous.UnitTests.HeterogeneousLists
 
 open Xunit
-open Nemonuri.Handles
 open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
 open Nemonuri.Collections.Heterogeneous.HeterogeneousLists
