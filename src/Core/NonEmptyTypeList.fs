@@ -20,6 +20,11 @@ module NonEmptyTypeLists = begin
 
     let tail l = l |> toDiff |> D.tail
 
+    let cons<'hd, 'pred, 'last
+                when 'pred :> D.IPredecessor<'pred>
+                and 'pred : unmanaged> l =
+        l |> toDiff |> D.cons<'hd, 'pred, D.Singleton<'last>> |> ofDiff
+
     let fold folder acc l = l |> toDiff |> D.fold folder acc
 
     let length l = l |> toDiff |> D.length
