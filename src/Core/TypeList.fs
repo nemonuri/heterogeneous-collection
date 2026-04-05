@@ -11,6 +11,13 @@ type TypeList<'TPred> = private { Diff: DiffTypeList<'TPred, D.Empty> }
 
 module TypeLists = begin   
 
+    type Empty = D.Empty
+
+    type Pair<'hd, 'pred
+        when 'pred :> D.IPredecessor<'pred>
+        and 'pred : unmanaged> = D.Pair<'hd, 'pred>
+
+
     let ofDiff d = { TypeList.Diff = d }
 
     let toDiff (l: TypeList<_>) = l.Diff
@@ -26,7 +33,7 @@ module TypeLists = begin
     let cons<'hd, 'pred
                 when 'pred :> D.IPredecessor<'pred>
                 and 'pred : unmanaged> tl = 
-        tl |> toDiff |> D.cons<'hd, 'pred, D.Empty> |> ofDiff
+        tl |> toDiff |> D.cons<'hd, 'pred, Empty> |> ofDiff
 
     let fold folder acc l = l |> toDiff |> D.fold folder acc
 
