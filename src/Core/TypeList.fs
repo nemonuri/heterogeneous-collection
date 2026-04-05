@@ -1,82 +1,35 @@
 namespace Nemonuri.Collections.Heterogeneous
 
-open System
-open Nemonuri.Collections.Heterogeneous.Primitives
 
-
-[<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
-type TypeList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 'TPred }
-
+module D = Nemonuri.Collections.Heterogeneous.DiffTypeLists
 
 module TypeLists = begin   
 
-    open Unchecked
+    type Empty = D.Empty
 
-    [<NoEquality; NoComparison>]
-    type Empty = struct
+    type TypeList<'pred> = DiffTypeList<'pred, Empty>
 
-        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
-
-        interface IFolderVisitable<Empty> with
-            member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
-
-    end
-
-    let empty: TypeList<Empty> = { Pred = defaultof<_> }
-
-    let isEmpty (l: TypeList<'a>) = typeof<'a> = typeof<Empty>
-
-    let private fold_core folder acc (l: TypeList<_>) = l.Pred.Accept(folder, acc, l.Pred)
-
-    [<NoEquality; NoComparison>]
-    type Pair<'hd, 'pred 
-                when 'pred : unmanaged
-                and 'pred :> IFolderVisitable<'pred>> = struct  //private { TypeList: TypeList<'pred> } 
-
-        member internal x.Tail = { TypeList.Pred = defaultof<'pred> }
-
-        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
-            let newAcc = folder.Step<'hd>(acc, Unchecked.defaultof<_>)
-            elem.Tail |> fold_core folder newAcc
-
-        interface IFolderVisitable<Pair<'hd, 'pred>> with
-            member _.Accept (folder, acc, elem) = Pair<'hd, 'pred>.Accept(folder, acc, elem)
-
-    end
-
-    module private Pairs = begin
-
-        let head (pair: Pair<'hd,_>) = typeof<'hd>
-
-        let tail (pair: Pair<_,_>) = pair.Tail
-
-    end
+    type Pair<'hd, 'pred
+        when 'pred :> D.IPredecessor<'pred>
+        and 'pred : unmanaged> = D.Pair<'hd, 'pred>
 
 
-    let private tryPredV (l: TypeList<_>) =
-        if isEmpty l then
-            ValueNone
-        else
-            l.Pred |> ValueSome
-    
-    let private toPair (l: TypeList<Pair<'hd, 'tl>>) =
-        match tryPredV l with
-        | ValueNone -> failwith "Unreachable"
-        | ValueSome pred -> pred
+    let empty : TypeList<Empty> = D.empty
 
-    let head l = toPair l |> Pairs.head
+    let isEmpty (l: TypeList<_>) = l |> D.isEmpty
 
-    let tail l = toPair l |> Pairs.tail
+    let head (l: TypeList<Pair<_,_>>) = l |> D.head
+
+    let tail (l: TypeList<Pair<_,_>>) = l |> D.tail
 
     let cons<'hd, 'pred
-                when 'pred : unmanaged
-                and 'pred :> IFolderVisitable<'pred>> (tl: TypeList<'pred>) = { TypeList.Pred = Pair<'hd,'pred>() }
-    
-    let fold folder acc l = fold_core folder acc l
+                when 'pred :> D.IPredecessor<'pred>
+                and 'pred : unmanaged> (tl: TypeList<'pred>) : TypeList<Pair<'hd, 'pred>> = 
+        tl |> D.cons<'hd, 'pred, Empty>
 
-    let private folderForLength = { new IFolder<int> with member _.Step (acc: int, _: 'T): int = acc + 1 }
+    let fold folder acc (l: TypeList<_>) = l |> D.fold folder acc
 
-    let length l = fold folderForLength 0 l
+    let length (l: TypeList<_>) = l |> D.length
+
 
 end

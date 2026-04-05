@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-& dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:TestProject |
+& dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:Tool_TestProject |
     Tee-Object -Variable testProject
 
 if ($LASTEXITCODE -ne 0) {

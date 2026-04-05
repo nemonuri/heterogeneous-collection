@@ -1,10 +1,22 @@
 <Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
-          Condition="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" />
+          Condition="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != '' and $(RepoRootPath) == ''" />
+
+  <ItemGroup>
+    <Tool_BuildProjects Include="$(SrcRootPath)**/*.*proj" />
+    <Tool_BuildProjects Remove="$(TestRootPath)**/*.*" />
+    <Tool_BuildProjects Remove="$(BenchmarkRootPath)**/*.*" />
+  </ItemGroup>
+
   <PropertyGroup>
-    <BenchmarkProject>$(BenchmarkRootPath)GResearch_And_Nemonuri/GResearch_And_Nemonuri.fsproj</BenchmarkProject>
-    <TestProject>$(TestRootPath)Core/Nemonuri.Collections.Heterogeneous.UnitTests.fsproj</TestProject>
+    <Tool_BenchmarkProject>$(BenchmarkRootPath)GResearch_And_Nemonuri/GResearch_And_Nemonuri.fsproj</Tool_BenchmarkProject>
+    <Tool_TestProject>$(TestRootPath)Core/Nemonuri.Collections.Heterogeneous.UnitTests.fsproj</Tool_TestProject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Tool_RestoreProjects Include="@(Tool_BuildProjects)" />
+    <Tool_RestoreProjects Include="$(Tool_BenchmarkProject);$(Tool_TestProject)"/>
+  </ItemGroup>
 
 </Project>

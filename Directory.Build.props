@@ -8,6 +8,8 @@
     <ResRootPath>$(RepoRootPath)res/</ResRootPath>
     <BenchmarkRootPath>$(SrcRootPath)benchmark/</BenchmarkRootPath>
     <TestRootPath>$(SrcRootPath)test/</TestRootPath>
+    <ToolRootPath>$(RepoRootPath)tool/</ToolRootPath>
+    <ToolProjectPath>$(RepoRootPath)Tool.proj</ToolProjectPath>
 
     <RepoTargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</RepoTargetFrameworks>
     <ToolTargetFramework>netstandard2.0</ToolTargetFramework>
