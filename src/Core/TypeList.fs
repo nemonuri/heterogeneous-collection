@@ -21,7 +21,7 @@ module TypeLists = begin
 
     let head l = l |> toDiff |> D.head
 
-    let tail l = l |> toDiff |> D.tail
+    let tail l = l |> toDiff |> D.tail |> ofDiff
 
     let cons<'hd, 'pred
                 when 'pred :> D.IPredecessor<'pred>

@@ -1,6 +1,7 @@
 namespace Nemonuri.Collections.Heterogeneous
 
 module D = Nemonuri.Collections.Heterogeneous.NonEmptyDiffTypeLists
+module Tl = Nemonuri.Collections.Heterogeneous.TypeLists
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
@@ -18,7 +19,7 @@ module NonEmptyTypeLists = begin
 
     let head l = l |> toDiff |> D.head
 
-    let tail l = l |> toDiff |> D.tail
+    let tail l = l |> toDiff |> D.tail |> ofDiff
 
     let cons<'hd, 'pred, 'last
                 when 'pred :> D.IPredecessor<'pred>
@@ -29,6 +30,6 @@ module NonEmptyTypeLists = begin
 
     let length l = l |> toDiff |> D.length
 
-end
 
+end
 
