@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup Label="Nuget">
     <Version>0.0.100-preview.2</Version>
-    <PackageReleaseNotes>First release.</PackageReleaseNotes>
+    <PackageReleaseNotes><![CDATA[
+- Add NonEmptyDiffTypeList, NonEmptyTypeList
+]]></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">

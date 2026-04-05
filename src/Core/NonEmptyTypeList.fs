@@ -3,38 +3,33 @@ namespace Nemonuri.Collections.Heterogeneous
 module D = Nemonuri.Collections.Heterogeneous.NonEmptyDiffTypeLists
 module Tl = Nemonuri.Collections.Heterogeneous.TypeLists
 
-[<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
-type NonEmptyTypeList<'TPred, 'TLast> = private { Diff: NonEmptyDiffTypeList<'TPred, D.Singleton<'TLast>> }
-
 module NonEmptyTypeLists = begin
 
     type Singleton<'T> = D.Singleton<'T>
+
+    type NonEmptyTypeList<'TPred, 'TLast> = NonEmptyDiffTypeList<'TPred, Singleton<'TLast>>
 
     type Pair<'hd, 'pred
         when 'pred :> D.IPredecessor<'pred>
         and 'pred : unmanaged> = D.Pair<'hd, 'pred>
 
-    let ofDiff d = { NonEmptyTypeList.Diff = d }
 
-    let toDiff (l: NonEmptyTypeList<_,_>) = l.Diff
+    let singleton<'a> : NonEmptyTypeList<Singleton<'a>,'a> = D.singleton<'a>
 
-    let singleton<'a> = D.singleton<'a> |> ofDiff
+    let isSingleton (l: NonEmptyTypeList<_,_>) = l |> D.isSingleton
 
-    let isSingleton l = l |> toDiff |> D.isSingleton
+    let head (l: NonEmptyTypeList<Pair<_,_>,_>) = l |> D.head
 
-    let head l = l |> toDiff |> D.head
-
-    let tail l = l |> toDiff |> D.tail |> ofDiff
+    let tail (l: NonEmptyTypeList<Pair<'hd, 'pred>, 'last>) : NonEmptyTypeList<'pred, 'last> = l |> D.tail
 
     let cons<'hd, 'pred, 'last
                 when 'pred :> D.IPredecessor<'pred>
-                and 'pred : unmanaged> l =
-        l |> toDiff |> D.cons<'hd, 'pred, Singleton<'last>> |> ofDiff
+                and 'pred : unmanaged> (l: NonEmptyTypeList<_,_>) : NonEmptyTypeList<Pair<_,_>,_> =
+        l  |> D.cons<'hd, 'pred, Singleton<'last>>
 
-    let fold folder acc l = l |> toDiff |> D.fold folder acc
+    let fold folder acc (l: NonEmptyTypeList<_,_>) = l |> D.fold folder acc
 
-    let length l = l |> toDiff |> D.length
+    let length (l: NonEmptyTypeList<_,_>) = l |> D.length
 
 
     type Premise' = struct

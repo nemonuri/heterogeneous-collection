@@ -3,41 +3,33 @@ namespace Nemonuri.Collections.Heterogeneous
 
 module D = Nemonuri.Collections.Heterogeneous.DiffTypeLists
 
-
-[<RequireQualifiedAccess>]
-[<NoEquality; NoComparison; Struct>]
-type TypeList<'TPred> = private { Diff: DiffTypeList<'TPred, D.Empty> }
-
-
 module TypeLists = begin   
 
     type Empty = D.Empty
+
+    type TypeList<'pred> = DiffTypeList<'pred, Empty>
 
     type Pair<'hd, 'pred
         when 'pred :> D.IPredecessor<'pred>
         and 'pred : unmanaged> = D.Pair<'hd, 'pred>
 
 
-    let ofDiff d = { TypeList.Diff = d }
+    let empty : TypeList<Empty> = D.empty
 
-    let toDiff (l: TypeList<_>) = l.Diff
+    let isEmpty (l: TypeList<_>) = l |> D.isEmpty
 
-    let empty = D.empty |> ofDiff
+    let head (l: TypeList<Pair<_,_>>) = l |> D.head
 
-    let isEmpty l = l |> toDiff |> D.isEmpty
-
-    let head l = l |> toDiff |> D.head
-
-    let tail l = l |> toDiff |> D.tail |> ofDiff
+    let tail (l: TypeList<Pair<_,_>>) = l |> D.tail
 
     let cons<'hd, 'pred
                 when 'pred :> D.IPredecessor<'pred>
-                and 'pred : unmanaged> tl = 
-        tl |> toDiff |> D.cons<'hd, 'pred, Empty> |> ofDiff
+                and 'pred : unmanaged> (tl: TypeList<'pred>) : TypeList<Pair<'hd, 'pred>> = 
+        tl |> D.cons<'hd, 'pred, Empty>
 
-    let fold folder acc l = l |> toDiff |> D.fold folder acc
+    let fold folder acc (l: TypeList<_>) = l |> D.fold folder acc
 
-    let length l = l |> toDiff |> D.length
+    let length (l: TypeList<_>) = l |> D.length
 
 
 end
