@@ -6,7 +6,7 @@ open Nemonuri.Collections.Heterogeneous
 open Nemonuri.Collections.Heterogeneous.Primitives
 open Nemonuri.Collections.Heterogeneous.TypeLists
 
-module private Fixtures = begin
+module internal Fixtures = begin
 
     let list1 =
         empty
@@ -15,6 +15,8 @@ module private Fixtures = begin
         |> cons<bool,_>
         |> cons<char,_>
         |> cons<uint32,_>
+
+    let expected1 = [typeof<int>; typeof<string>; typeof<bool>; typeof<char>; typeof<uint32>]
 
     let typeListFolder = 
         { new IFolder<Type list> with
@@ -45,5 +47,4 @@ let ``(head Fixtures.list1) is (typeof<uint32>)``() =
 [<Fact>]
 let ``fold list1 by typeListFolder is expected``() =
     let actual = fold Fixtures.typeListFolder [] Fixtures.list1
-    let expected = [typeof<int>; typeof<string>; typeof<bool>; typeof<char>; typeof<uint32>]
-    Assert.Equal<Type>(expected, actual)
+    Assert.Equal<Type>(Fixtures.expected1, actual)

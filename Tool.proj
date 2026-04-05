@@ -1,26 +1,29 @@
 <Project Sdk="Microsoft.Build.NoTargets">
+  
+  <Import Project="$(ToolRootPath)Directory.Build.props" />
+  
   <PropertyGroup>
     <TargetFramework>$(ToolTargetFramework)</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   
-  <ItemGroup>
-    <MainBuildProjects Include="$(SrcRootPath)**/*.*proj" />
-    <MainBuildProjects Remove="**/test/**/*.*" />
-    <MainBuildProjects Remove="$(BenchmarkRootPath)**/*.*" />
-  </ItemGroup>
-  
-  <Target Name="MainBuild" AfterTargets="Build">
+  <Target Name="Tool_Build" AfterTargets="Build">
     <MSBuild
-      Projects="@(MainBuildProjects)"
+      Projects="@(Tool_BuildProjects)"
       Targets="Build" />
   </Target>
-  
-  <Target Name="MainPack" AfterTargets="Pack">
+
+  <Target Name="Tool_Pack" AfterTargets="Pack">
     <MSBuild
-      Projects="@(MainBuildProjects)"
+      Projects="@(Tool_BuildProjects)"
       Targets="Pack"
       Properties="Configuration=Release;Optimize=true" />
+  </Target>
+
+  <Target Name="Tool_Restore" AfterTargets="Restore">
+    <MSBuild
+      Projects="@(Tool_RestoreProjects)"
+      Targets="Restore" />
   </Target>
 
 </Project>

@@ -11,7 +11,7 @@ if ($ExtraArgs.Length -gt 0) {
     Write-Host "ExtraArgs = $($ExtraArgs -join " ")"
 }
 
-& dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:BenchmarkProject |
+& dotnet msbuild "$PSScriptRoot/Directory.Build.props" -getProperty:Tool_BenchmarkProject |
     Tee-Object -Variable benchmarkProject
 
 if ($LASTEXITCODE -ne 0) {

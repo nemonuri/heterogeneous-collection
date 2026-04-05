@@ -2,6 +2,7 @@ namespace Nemonuri.Collections.Heterogeneous
 
 module D = Nemonuri.Collections.Heterogeneous.NonEmptyDiffTypeLists
 module Tl = Nemonuri.Collections.Heterogeneous.TypeLists
+module Dt = Nemonuri.Collections.Heterogeneous.DiffTypeLists
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
@@ -30,6 +31,28 @@ module NonEmptyTypeLists = begin
 
     let length l = l |> toDiff |> D.length
 
+
+    type Premise' = struct
+
+        static member inline Call prem pred l =
+            let inline call (prem0: ^p1) (pred0: ^p2) (l0: ^l) = ((^p1 or ^p2) : (static member ToTypeList : _*_*_ -> _) prem0, pred0, l0) 
+            call prem pred l
+
+        static member ToTypeList(prem :_, pred: D.Singleton<'TLast>, l: NonEmptyTypeList<D.Singleton<'TLast>, 'TLast>) = 
+            Tl.empty 
+            |> Tl.cons<'TLast,_>
+
+        static member inline ToTypeList(prem :_, pred: D.Pair<'THead, ^TPred>, l: NonEmptyTypeList<D.Pair<'THead, ^TPred>, 'TLast>) = 
+            l
+            |> tail
+            |> Premise'.Call prem Unchecked.defaultof<^TPred>
+            |> Tl.cons<'THead,_>
+
+    end
+
+    let inline toTypeList (l: NonEmptyTypeList<^TPred, 'TLast>) =
+        l
+        |> Premise'.Call Unchecked.defaultof<Premise'> Unchecked.defaultof<^TPred> 
 
 end
 
