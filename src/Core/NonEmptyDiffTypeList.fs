@@ -66,7 +66,7 @@ module NonEmptyDiffTypeLists = begin
                 when 'anc :> IPredecessor<'anc>
                 and 'anc : unmanaged> : NonEmptyDiffTypeList<'anc,'anc> = NonEmptyDiffTypeList.T   
     
-    let create<'a> = assume<Singleton<'a>>
+    let singleton<'a> = assume<Singleton<'a>>
 
     let private toPred (l: NonEmptyDiffTypeList<Pred<'pred>, Pred<'anc>>) = defaultof<'pred>
 
