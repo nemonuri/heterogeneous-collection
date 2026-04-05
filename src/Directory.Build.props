@@ -21,7 +21,7 @@
     <RepositoryUrl>https://github.com/nemonuri/heterogeneous-collection</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
-    <IncludeSource>true</IncludeSource>
+    <IncludeSource>false</IncludeSource>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     
   </PropertyGroup>
