@@ -6,8 +6,8 @@ open GResearch_And_Nemonrui
 [<EntryPoint>]
 let main argv =
     BenchmarkSwitcher.FromTypes([|
-        //typeof<HeterogeneousListBenchmarks>; 
-        //typeof<TypeListBenchmarks>;
+        typeof<HeterogeneousListBenchmarks>; 
+        typeof<TypeListBenchmarks>;
         typeof<DiffTypeListBenchMarks>|])
     |> _.RunAllJoined() 
     |> ignore

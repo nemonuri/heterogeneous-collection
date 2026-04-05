@@ -2,11 +2,12 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open Nemonuri.Collections.Heterogeneous.Primitives
 
+
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type DiffTypeList<'TPred, 'TAnc> = private | T
+type NonEmptyDiffTypeList<'TPred, 'TAnc> = private | T
 
-module DiffTypeLists = begin
+module NonEmptyDiffTypeLists = begin
 
     open Unchecked
 
@@ -17,24 +18,26 @@ module DiffTypeLists = begin
         abstract member Length: int
 
     end
-    
-    and [<NoEquality; NoComparison>]
-        Empty = struct
 
-        static member private Length = 0
+    [<NoEquality; NoComparison>]
+    type Singleton<'T> = struct
 
-        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
+        static member private Length = 1
 
-        interface IPredecessor<Empty> with
-            member _.Length = Empty.Length
+        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Singleton<'T>) = 
+            let newAcc = folder.Step<'T>(acc, defaultof<_>) in
+            newAcc
 
-            member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
+        interface IPredecessor<Singleton<'T>> with
+            member _.Length = Singleton<'T>.Length
+
+            member _.Accept (folder, acc, elem) = Singleton<'T>.Accept(folder, acc, elem)
 
     end
 
-    and [<RequireQualifiedAccess>]
-        [<NoEquality; NoComparison>]
-        Pair<'hd, 'pred
+    [<RequireQualifiedAccess>]
+    [<NoEquality; NoComparison>]
+    type Pair<'hd, 'pred
                 when 'pred :> IPredecessor<'pred>
                 and 'pred : unmanaged> = struct
 
@@ -61,54 +64,53 @@ module DiffTypeLists = begin
 
     let assume<'anc
                 when 'anc :> IPredecessor<'anc>
-                and 'anc : unmanaged> : DiffTypeList<'anc,'anc> = DiffTypeList.T   
+                and 'anc : unmanaged> : NonEmptyDiffTypeList<'anc,'anc> = NonEmptyDiffTypeList.T   
     
-    let empty : DiffTypeList<Empty, Empty> = assume<Empty>
+    let create<'a> = assume<Singleton<'a>>
 
-    let private toPred (l: DiffTypeList<Pred<'pred>, Pred<'anc>>) = defaultof<'pred>
+    let private toPred (l: NonEmptyDiffTypeList<Pred<'pred>, Pred<'anc>>) = defaultof<'pred>
 
-    let isEmpty (l: DiffTypeList<'pred,'anc>) = (toPred l |> _.Length) = 0
-
+    let isSingleton (l: NonEmptyDiffTypeList<'pred,'anc>) = (toPred l |> _.Length) = 1
 
     module private Pairs = begin
 
         let head (pair: Pair<'hd,_>) = typeof<'hd>
 
-        let tail (pair: Pair<'hd, 'pred>) : DiffTypeList<'pred, 'anc> = DiffTypeList.T
+        let tail (pair: Pair<'hd, 'pred>) : NonEmptyDiffTypeList<'pred, 'anc> = NonEmptyDiffTypeList.T
 
     end
 
     let private tryPredV l =
-        match isEmpty l with
+        match isSingleton l with
         | true -> ValueNone
         | false -> ValueSome (toPred l)
     
-    let private toPair (l: DiffTypeList<Pair<'hd, 'pred>, 'anc>) =
+    let private toPair (l: NonEmptyDiffTypeList<Pair<'hd, 'pred>, 'anc>) =
         match tryPredV l with
         | ValueNone -> failwith "Unreachable"
         | ValueSome pred -> pred
-
 
     let head l = toPair l |> Pairs.head
 
     let private tail_core l = toPair l |> Pairs.tail
 
-    let tail (l: DiffTypeList<Pair<'hd, 'pred>,'anc>) : DiffTypeList<'pred, 'anc> = tail_core l
+    let tail (l: NonEmptyDiffTypeList<Pair<'hd, 'pred>,'anc>) : NonEmptyDiffTypeList<'pred, 'anc> = tail_core l
 
     let cons<'hd, 'pred, 'anc
                 when 'pred :> IPredecessor<'pred>
                 and 'pred : unmanaged
                 and 'anc :> IPredecessor<'anc>
-                and 'anc : unmanaged> (tl: DiffTypeList<'pred, 'anc>) : DiffTypeList<Pair<'hd, 'pred>, 'anc> = DiffTypeList.T
+                and 'anc : unmanaged> (tl: NonEmptyDiffTypeList<'pred, 'anc>) : NonEmptyDiffTypeList<Pair<'hd, 'pred>, 'anc> = NonEmptyDiffTypeList.T
 
-    let append (first: DiffTypeList<'pred, Pred<'anc1>>) (second: DiffTypeList<'anc1, Pred<'anc2>>) : DiffTypeList<'pred, 'anc2> = DiffTypeList.T
+    let append (first: NonEmptyDiffTypeList<'pred, Pred<'anc1>>) (second: NonEmptyDiffTypeList<'anc1, Pred<'anc2>>) : NonEmptyDiffTypeList<'pred, 'anc2> = NonEmptyDiffTypeList.T
 
-    let private fold_core folder acc (l: DiffTypeList<_,_>) =
+    let private fold_core folder acc (l: NonEmptyDiffTypeList<_,_>) =
         let pred = toPred l in
         pred.Accept(folder, acc, pred)
     
     let fold folder acc l = fold_core folder acc l
 
     let length l = (toPred l).Length
+
 
 end

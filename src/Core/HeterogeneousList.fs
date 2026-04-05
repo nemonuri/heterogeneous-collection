@@ -4,7 +4,7 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
-type HeterogeneousList<'TPred when 'TPred :> IFolderVisitable<'TPred>> = private { Pred: 'TPred }
+type HeterogeneousList<'TPred> = private { Pred: 'TPred } // when 'TPred :> IFolderVisitable<'TPred>
 
 
 module HeterogeneousLists = begin
@@ -23,8 +23,9 @@ module HeterogeneousLists = begin
 
     let isEmpty (l: HeterogeneousList<'a>) = typeof<'a> = typeof<Empty>
 
+    type private Pred<'a when 'a :> IFolderVisitable<'a>> = 'a
 
-    let private fold_core folder acc (l: HeterogeneousList<_>) = l.Pred.Accept(folder, acc, l.Pred)
+    let private fold_core folder acc (l: HeterogeneousList<Pred<'pred>>) = l.Pred.Accept(folder, acc, l.Pred)
 
     [<RequireQualifiedAccess>]
     [<NoEquality; NoComparison; Struct>]

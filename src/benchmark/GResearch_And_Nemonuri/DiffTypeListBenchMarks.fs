@@ -11,7 +11,7 @@ module D = Nemonuri.Collections.Heterogeneous.DiffTypeLists
 
 [<MemoryDiagnoser; DisassemblyDiagnoser>]
 [<ShortRunJob(RuntimeMoniker.Net10_0)>]
-[<ShortRunJob(RuntimeMoniker.Net80)>]
+//[<ShortRunJob(RuntimeMoniker.Net80)>]
 [<ShortRunJob(RuntimeMoniker.Net472)>]
 type DiffTypeListBenchMarks () =
 
@@ -36,7 +36,7 @@ type DiffTypeListBenchMarks () =
         |> D.cons<uint32,_,_>
 
     member _.mkList2<'a when 'a :> D.IPredecessor<'a> and 'a : unmanaged>() =
-        D.create<'a>
+        D.assume<'a>
         |> D.cons<float,_,_>
         |> D.cons<unit,_,_>
         |> D.cons<nativeint,_,_>

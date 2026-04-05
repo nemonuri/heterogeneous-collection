@@ -6,7 +6,7 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison; Struct>]
-type TypeList<'TPred> = private | T //{ Pred: 'TPred }
+type TypeList<'TPred> = private | T 
 
 
 module TypeLists = begin   
