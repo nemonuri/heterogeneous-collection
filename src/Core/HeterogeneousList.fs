@@ -4,7 +4,7 @@ open Nemonuri.Collections.Heterogeneous.Primitives
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
-type HeterogeneousList<'TPred> = private { Pred: 'TPred } // when 'TPred :> IFolderVisitable<'TPred>
+type HeterogeneousList<'TPred> = private { Pred: 'TPred }
 
 
 module HeterogeneousLists = begin

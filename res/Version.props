@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Nuget">
-    <Version>0.0.100-preview.2</Version>
+    <Version>0.0.100-preview.3</Version>
     <PackageReleaseNotes><![CDATA[
 - Add NonEmptyDiffTypeList, NonEmptyTypeList
 ]]></PackageReleaseNotes>

@@ -1,5 +1,6 @@
 namespace Nemonuri.Collections.Heterogeneous
 
+open Nemonuri.Collections.Heterogeneous.Primitives
 module D = Nemonuri.Collections.Heterogeneous.NonEmptyDiffTypeLists
 module Tl = Nemonuri.Collections.Heterogeneous.TypeLists
 
@@ -9,9 +10,8 @@ module NonEmptyTypeLists = begin
 
     type NonEmptyTypeList<'TPred, 'TLast> = NonEmptyDiffTypeList<'TPred, Singleton<'TLast>>
 
-    type Pair<'hd, 'pred
-        when 'pred :> D.IPredecessor<'pred>
-        and 'pred : unmanaged> = D.Pair<'hd, 'pred>
+    type Pair<'hd, 'tl
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> = D.Pair<'hd, 'tl>
 
 
     let singleton<'a> : NonEmptyTypeList<Singleton<'a>,'a> = D.singleton<'a>
@@ -22,10 +22,10 @@ module NonEmptyTypeLists = begin
 
     let tail (l: NonEmptyTypeList<Pair<'hd, 'pred>, 'last>) : NonEmptyTypeList<'pred, 'last> = l |> D.tail
 
-    let cons<'hd, 'pred, 'last
-                when 'pred :> D.IPredecessor<'pred>
-                and 'pred : unmanaged> (l: NonEmptyTypeList<_,_>) : NonEmptyTypeList<Pair<_,_>,_> =
-        l  |> D.cons<'hd, 'pred, Singleton<'last>>
+    let cons<'hd, 'tl, 'last
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> 
+                (l: NonEmptyTypeList<_,_>) : NonEmptyTypeList<Pair<_,_>,_> =
+        l |> D.cons<'hd, 'tl, Singleton<'last>>
 
     let fold folder acc (l: NonEmptyTypeList<_,_>) = l |> D.fold folder acc
 
