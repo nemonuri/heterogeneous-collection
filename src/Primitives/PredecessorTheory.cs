@@ -1,6 +1,6 @@
 namespace Nemonuri.Collections.Heterogeneous.Primitives;
 
-
+#if false
 public static class PredecessorTheory
 {
     extension<TPredecessor>(TPredecessor)
@@ -24,3 +24,6 @@ public static class PredecessorTheory
         public static int GetTailLength() => GetTailPremise<TTail, TPredecessor>().Length;
     }
 }
+#endif
+
+// ...'new()' 제약조건이 문제가 될 줄은 상상도 못 했다;;

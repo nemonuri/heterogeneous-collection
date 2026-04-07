@@ -34,13 +34,13 @@ module NonEmptyDiffTypeLists = begin
     [<RequireQualifiedAccess>]
     [<NoEquality; NoComparison>]
     type Pair<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : (new:unit -> 'tl)> = struct
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = struct
 
-        static member private Length = PredecessorTheory.GetTailLength<'tl, Pair<'hd, 'tl>>() + 1
+        static member private Length = Predecessors.tailLength<'tl, Pair<'hd, 'tl>> + 1
 
         static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'tl>) = 
             let newAcc = folder.Step<'hd>(acc, defaultof<_>) in
-            PredecessorTheory.VisitTail<'tl, Pair<'hd, 'tl>, _>(folder, newAcc,  new 'tl())
+            Predecessors.visitTail<'tl, Pair<'hd, 'tl>, _> folder newAcc defaultof<'tl>
 
         interface IPredecessor
 
@@ -56,7 +56,7 @@ module NonEmptyDiffTypeLists = begin
     
     let singleton<'a> = assume<Singleton<'a>>
 
-    let length (l: NonEmptyDiffTypeList<'pred,'anc>) = PredecessorTheory.GetLength<'pred>()
+    let length (l: NonEmptyDiffTypeList<'pred,'anc>) = Predecessors.length<'pred>
 
     let isSingleton l = (length l) = 1
 
@@ -85,7 +85,7 @@ module NonEmptyDiffTypeLists = begin
     let tail (l: NonEmptyDiffTypeList<Pair<'hd, 'pred>,'anc>) : NonEmptyDiffTypeList<'pred, 'anc> = tail_core l
 
     let cons<'hd, 'tl, 'anc
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : (new:unit -> 'tl)> 
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> 
         (tl: NonEmptyDiffTypeList<'tl,'anc>) : NonEmptyDiffTypeList<Pair<'hd, 'tl>, 'anc> = 
         NonEmptyDiffTypeList.T
 
@@ -96,9 +96,7 @@ module NonEmptyDiffTypeLists = begin
         (first: NonEmptyDiffTypeList<'pred, 'anc1>) (second: NonEmptyDiffTypeList<'anc1, 'anc2>) : NonEmptyDiffTypeList<'pred, 'anc2> = NonEmptyDiffTypeList.T
 
     
-    let fold folder (seed: 'state) (l: NonEmptyDiffTypeList<'pred, 'anc>) = PredecessorTheory.Accept<'pred, 'state>(folder, seed, new 'pred())
-
-    
+    let fold folder (seed: 'state) (l: NonEmptyDiffTypeList<'pred, 'anc>) = Predecessors.accept folder seed defaultof<'pred>
 
 
 end

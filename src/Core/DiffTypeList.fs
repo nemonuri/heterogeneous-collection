@@ -31,13 +31,13 @@ module DiffTypeLists = begin
     [<RequireQualifiedAccess>]
     [<NoEquality; NoComparison>]
     type Pair<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : (new:unit -> 'tl)> = struct
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = struct
 
-        static member private Length = PredecessorTheory.GetTailLength<'tl, Pair<'hd, 'tl>>() + 1
+        static member private Length = Predecessors.tailLength<'tl, Pair<'hd, 'tl>> + 1
 
         static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'tl>) = 
             let newAcc = folder.Step<'hd>(acc, defaultof<_>) in
-            PredecessorTheory.VisitTail<'tl, Pair<'hd, 'tl>, 'TState>(folder, newAcc, new 'tl())
+            Predecessors.visitTail<'tl,Pair<'hd, 'tl>,_> folder newAcc defaultof<'tl>
         
         interface IPredecessor
         
@@ -51,7 +51,7 @@ module DiffTypeLists = begin
     
     let empty : DiffTypeList<Empty, Empty> = assume<Empty>
 
-    let length (l: DiffTypeList<'pred, 'anc>) = PredecessorTheory.GetLength<'pred>()
+    let length (l: DiffTypeList<'pred, 'anc>) = Predecessors.length<'pred>
 
     let isEmpty (l: DiffTypeList<'pred,'anc>) = (length l) = 0
 
@@ -83,7 +83,7 @@ module DiffTypeLists = begin
     let tail (l: DiffTypeList<Pair<'hd, 'tl>,'anc>) : DiffTypeList<'tl, 'anc> = tail_core l
 
     let cons<'hd, 'tl, 'anc
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : (new:unit -> 'tl)> (tl: DiffTypeList<'tl, 'anc>) : DiffTypeList<Pair<'hd, 'tl>, 'anc> = DiffTypeList.T
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> (tl: DiffTypeList<'tl, 'anc>) : DiffTypeList<Pair<'hd, 'tl>, 'anc> = DiffTypeList.T
 
     let append<'pred, 'anc1, 'anc2 
                 when 'pred :> IPredecessor
@@ -93,8 +93,8 @@ module DiffTypeLists = begin
 
     
     let fold folder (seed: 'state) (l: DiffTypeList<'pred,'anc>) = 
-        PredecessorTheory.Accept<'pred, 'state>(folder, seed, new 'pred())
-
+        Predecessors.accept folder seed defaultof<'pred>
+        
     
 
 end

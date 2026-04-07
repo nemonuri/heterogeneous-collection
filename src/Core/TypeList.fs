@@ -11,7 +11,7 @@ module TypeLists = begin
     type TypeList<'pred> = DiffTypeList<'pred, Empty>
 
     type Pair<'hd, 'tl
-        when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> = D.Pair<'hd, 'tl>
+        when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : struct> = D.Pair<'hd, 'tl>
 
 
     let empty : TypeList<Empty> = D.empty
@@ -25,7 +25,7 @@ module TypeLists = begin
     let tail (l: TypeList<Pair<_,_>>) = l |> D.tail
 
     let cons<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> 
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : struct> 
                 (tl: TypeList<'tl>) : TypeList<Pair<'hd, 'tl>> = 
         tl |> D.cons<'hd, 'tl, Empty>
 

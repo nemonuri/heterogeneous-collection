@@ -11,7 +11,7 @@ module NonEmptyTypeLists = begin
     type NonEmptyTypeList<'TPred, 'TLast> = NonEmptyDiffTypeList<'TPred, Singleton<'TLast>>
 
     type Pair<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> = D.Pair<'hd, 'tl>
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : struct> = D.Pair<'hd, 'tl>
 
 
     let singleton<'a> : NonEmptyTypeList<Singleton<'a>,'a> = D.singleton<'a>
@@ -23,7 +23,7 @@ module NonEmptyTypeLists = begin
     let tail (l: NonEmptyTypeList<Pair<'hd, 'pred>, 'last>) : NonEmptyTypeList<'pred, 'last> = l |> D.tail
 
     let cons<'hd, 'tl, 'last
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : (new:unit -> 'tl)> 
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> D.IPredecessor and 'tl : struct> 
                 (l: NonEmptyTypeList<_,_>) : NonEmptyTypeList<Pair<_,_>,_> =
         l |> D.cons<'hd, 'tl, Singleton<'last>>
 
