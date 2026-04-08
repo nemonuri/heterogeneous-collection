@@ -2,74 +2,52 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open System.Runtime.CompilerServices
 open Nemonuri.Collections.Heterogeneous.Primitives
-module Hl = HeterogeneousLists
+module H = HeterogeneousLists
 
 [<RequireQualifiedAccess>]
-[<NoEquality; NoComparison>]
+[<NoEquality; NoComparison; Struct>]
 type DiffList<'TPred, 'TAnc> = 
     private { 
-        Pred: 'TPred; 
-        mutable Anc: IInRefProvider<'TAnc> | null;
+        Arrow: HeterogeneousList<'TAnc> -> HeterogeneousList<'TPred>;
     }
-    with
-    
-        member private this.GetInRef() : inref<'TPred> =
-            if typeof<'TPred> = typeof<'TAnc> then
-                match this.Anc with
-                | :? IInRefProvider<'TPred> as p -> &p.InRef
-                | _ -> &(Unsafe.NullRef<_>())
-            else
-                &this.Pred
-
-
-        interface IInRefProvider<'TPred> with
-
-            member x.InRef = &x.GetInRef()
-
-    end
 
 
 module DiffLists = begin
 
-    type IPredecessor = Hl.IPredecessor
+    let private ofArrow arrow = { DiffList.Arrow = arrow }
 
-    let assume<'anc when 'anc :> IPredecessor> : DiffList<'anc, 'anc> = { Pred = Unchecked.defaultof<_>; Anc = null }
-        
-    let private isAssume (l: DiffList<'pred, 'anc>) = typeof<'pred> = typeof<'anc>
+    type IPredecessor = H.IPredecessor
 
-    [<NoEquality; NoComparison; Sealed>]
-    type private EmptyInRef = class
+    type Empty = H.Empty
 
-        static let s_empty = Hl.Empty()
+    type Pair<'hd, 'tl
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = H.Pair<'hd, 'tl>
 
-        static member private EmptyInRef = &s_empty
+    let assume<'anc when 'anc :> IPredecessor> : DiffList<'anc, 'anc> = id |> ofArrow
 
-        private new() = {}
+    let empty = assume<Empty>
 
-        static member Instance = EmptyInRef()
+    let toHeterogeneousList (l: DiffList<'pred, Empty>) = l.Arrow H.empty
 
-        interface IInRefProvider<Hl.Empty> with
+    let private konst (l: HeterogeneousList<_>) (e: HeterogeneousList<Empty>) = l
 
-            member x.InRef = &EmptyInRef.EmptyInRef
+    let ofHeterogeneousList (l: HeterogeneousList<_>) = l |> konst |> ofArrow
 
-    end
+    let length l = l |> toHeterogeneousList |> H.length
 
-    let empty : DiffList<Hl.Empty, Hl.Empty> = { Pred = Hl.Empty(); Anc = EmptyInRef.Instance }
+    let isEmpty l = l |> toHeterogeneousList |> H.isEmpty
 
-    let length (l: DiffList<'pred, 'anc>) = Predecessors.length<'pred>
-
-    let isEmpty l = (length l) = 0
+    let cons (hd: 'hd) (tl: DiffList<'tl, 'anc>) : DiffList<Pair<'hd,'tl>,'anc> = 
+        tl.Arrow >> H.cons hd |> ofArrow
 
 
-    let head (l: DiffList<Hl.Pair<_,_>,_>) = l.Pred.Head
+    let head (l: DiffList<Pair<_,_>,Empty>) = l |> toHeterogeneousList |> H.head
 
-    let tail (l: DiffList<Hl.Pair<_,_>,_>) = l.Pred.Tail :?> DiffList<_,_>
+    let tail (l: DiffList<Pair<_,_>,Empty>) = l |> toHeterogeneousList |> H.tail |> ofHeterogeneousList
 
-    let cons (hd: 'hd) (tl: DiffList<'tl, 'anc>) =
-        isAssume tl
 
-    let fold folder (seed: 'state) (l: DiffList<'pred, 'anc>) =
-        Hl.fold folder seed l.InnerList
+    let fold folder seed l = 
+        l |> toHeterogeneousList |> H.fold folder seed
 
 
     let append<'pred, 'anc1, 'anc2
@@ -77,9 +55,8 @@ module DiffLists = begin
                 and 'anc1 :> IPredecessor
                 and 'anc2 :> IPredecessor>
         (first: DiffList<'pred, 'anc1>) (second: DiffList<'anc1, 'anc2>) : DiffList<'pred, 'anc2> =
-        match first.InnerList with
-        | null -> second |> unbox
-        | il ->
+        second.Arrow >> first.Arrow |> ofArrow
+
             
             
 
