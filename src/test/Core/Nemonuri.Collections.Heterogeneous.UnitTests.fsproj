@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="TypeLists.fs" /><Compile Include="HeterogeneousLists.fs" /><Compile Include="DiffTypeLists.fs" /><Compile Include="NonEmptyTypeLists.fs" />
+    <Compile Include="TypeLists.fs" /><Compile Include="HeterogeneousLists.fs" /><Compile Include="DiffTypeLists.fs" /><Compile Include="NonEmptyTypeLists.fs" /><Compile Include="DiffLists.fs" />
   </ItemGroup>
 
   <ItemGroup>

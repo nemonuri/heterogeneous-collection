@@ -57,8 +57,7 @@ module DiffLists = begin
         (first: DiffList<'pred, 'anc1>) (second: DiffList<'anc1, 'anc2>) : DiffList<'pred, 'anc2> =
         second.Arrow >> first.Arrow |> ofArrow
 
-            
-            
+    let appendEmpty dl = append dl empty
 
 
 end

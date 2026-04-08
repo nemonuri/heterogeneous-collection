@@ -47,7 +47,7 @@ module DiffTypeLists = begin
 
     end
 
-    let assume<'anc when 'anc :> IPredecessor> : DiffTypeList<'anc,'anc> = DiffTypeList.T   
+    let assume<'anc when 'anc :> IPredecessorPremise<'anc> and 'anc :> IPredecessor and 'anc : struct> : DiffTypeList<'anc,'anc> = DiffTypeList.T   
     
     let empty : DiffTypeList<Empty, Empty> = assume<Empty>
 

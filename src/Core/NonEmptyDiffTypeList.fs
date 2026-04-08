@@ -52,7 +52,8 @@ module NonEmptyDiffTypeLists = begin
     end
 
 
-    let assume<'anc when 'anc :> IPredecessor> : NonEmptyDiffTypeList<'anc,'anc> = NonEmptyDiffTypeList.T   
+    let assume<'anc 
+                when 'anc :> IPredecessorPremise<'anc> and 'anc :> IPredecessor and 'anc : struct> : NonEmptyDiffTypeList<'anc,'anc> = NonEmptyDiffTypeList.T   
     
     let singleton<'a> = assume<Singleton<'a>>
 
