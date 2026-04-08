@@ -1,6 +1,5 @@
 namespace Nemonuri.Collections.Heterogeneous
 
-open System.Runtime.CompilerServices
 open Nemonuri.Collections.Heterogeneous.Primitives
 module H = HeterogeneousLists
 
@@ -21,9 +20,11 @@ module DiffLists = begin
     type Empty = H.Empty
 
     type Pair<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = H.Pair<'hd, 'tl>
+                when 'tl :> IPredecessorPremise<'tl> and 'tl : struct> = H.Pair<'hd, 'tl>
 
-    let assume<'anc when 'anc :> IPredecessor> : DiffList<'anc, 'anc> = id |> ofArrow
+    let assume<'anc 
+                when 'anc :> IPredecessorPremise<'anc> and 'anc :> IPredecessor and 'anc : struct> : DiffList<'anc,'anc>
+        = id |> ofArrow
 
     let empty = assume<Empty>
 

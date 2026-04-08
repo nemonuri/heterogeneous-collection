@@ -2,19 +2,6 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open Nemonuri.Collections.Heterogeneous.Primitives
 
-#if false
-module internal HeterogeneousListInternals = begin
-
-    type IInRefProvider<'a> = interface
-
-        abstract member InRef: inref<'a>
-
-    end
-
-end
-
-open HeterogeneousListInternals
-#endif
 
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
@@ -44,8 +31,8 @@ module HeterogeneousLists = begin
     [<RequireQualifiedAccess>]
     [<NoEquality; NoComparison; Struct>]
     type Pair<'hd, 'tl
-                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = 
-        internal { Head: 'hd; Tail: HeterogeneousList<'tl> } with
+                when 'tl :> IPredecessorPremise<'tl> and 'tl : struct> = 
+        private { Head: 'hd; Tail: HeterogeneousList<'tl> } with
 
         static member private Length = Predecessors.tailLength<'tl, Pair<'hd, 'tl>> + 1
 
@@ -84,9 +71,10 @@ module HeterogeneousLists = begin
 
     let tail l = toPair l |> _.Tail
     
+    let inline private cons_aux<'tl when 'tl :> IPredecessor> (l: HeterogeneousList<'tl>) = l
 
     let cons (hd: 'hd) (l: HeterogeneousList<'tl>) =
-        let pred = { Pair.Head = hd; Pair.Tail = l; } in
+        let pred = { Pair.Head = hd; Pair.Tail = l |> cons_aux; } in
         { HeterogeneousList.Pred = pred }
 
     let fold folder (seed: 'state) (l: HeterogeneousList<'pred>) = Predecessors.accept folder seed l.Pred
