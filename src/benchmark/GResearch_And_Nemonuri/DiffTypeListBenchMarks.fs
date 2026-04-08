@@ -35,7 +35,7 @@ type DiffTypeListBenchMarks () =
         |> D.cons<char,_,_>
         |> D.cons<uint32,_,_>
 
-    member _.mkList2<'a when 'a :> D.IPredecessor<'a> and 'a : unmanaged>() =
+    member _.mkList2<'a when 'a :> D.IPredecessor and 'a :> IPredecessorPremise<'a> and 'a : struct>() =
         D.assume<'a>
         |> D.cons<float,_,_>
         |> D.cons<unit,_,_>

@@ -8,7 +8,8 @@ let main argv =
     BenchmarkSwitcher.FromTypes([|
         typeof<HeterogeneousListBenchmarks>; 
         typeof<TypeListBenchmarks>;
-        typeof<DiffTypeListBenchMarks>|])
+        typeof<DiffTypeListBenchMarks>;
+        typeof<DiffListBenchMarks>|])
     |> _.RunAllJoined() 
     |> ignore
     0 // return an integer exit code

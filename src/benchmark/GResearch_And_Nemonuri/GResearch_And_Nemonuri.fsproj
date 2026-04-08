@@ -20,7 +20,7 @@
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HeterogeneousListBenchmarks.fs" /><Compile Include="TypeListBenchMarks.fs" /><Compile Include="DiffTypeListBenchMarks.fs" />
+    <Compile Include="HeterogeneousListBenchmarks.fs" /><Compile Include="TypeListBenchMarks.fs" /><Compile Include="DiffTypeListBenchMarks.fs" /><Compile Include="DiffListBenchMarks.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />
