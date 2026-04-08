@@ -10,10 +10,11 @@
     <Compile Include="TypeList.fs" />
     <Compile Include="NonEmptyDiffTypeList.fs" />
     <Compile Include="NonEmptyTypeList.fs" />
-    <Compile Include="HeterogeneousList.fs" /><Compile Include="DiffList.fs" />
-    
+    <Compile Include="HeterogeneousList.fs" />
+    <Compile Include="DiffList.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
     <ProjectReference Include="..\Primitives\Nemonuri.Collections.Heterogeneous.Primitives.csproj" />
   </ItemGroup>
 </Project>

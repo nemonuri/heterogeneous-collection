@@ -2,6 +2,20 @@ namespace Nemonuri.Collections.Heterogeneous
 
 open Nemonuri.Collections.Heterogeneous.Primitives
 
+#if false
+module internal HeterogeneousListInternals = begin
+
+    type IInRefProvider<'a> = interface
+
+        abstract member InRef: inref<'a>
+
+    end
+
+end
+
+open HeterogeneousListInternals
+#endif
+
 [<RequireQualifiedAccess>]
 [<NoEquality; NoComparison>]
 type HeterogeneousList<'TPred> = private { Pred: 'TPred }
@@ -9,36 +23,51 @@ type HeterogeneousList<'TPred> = private { Pred: 'TPred }
 
 module HeterogeneousLists = begin
 
+    type IPredecessor = interface end
+
     [<NoEquality; NoComparison>]
     type Empty = struct 
 
+        static member private Length = 0
+
         static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Empty) = acc
 
-        interface IFolderVisitable<Empty> with
+        interface IPredecessor
+
+        interface IPredecessorPremise<Empty> with
+            member _.Length = Empty.Length
+
             member _.Accept (folder, acc, elem) = Empty.Accept(folder, acc, elem)
 
     end
 
-    let empty: HeterogeneousList<Empty> = { Pred = Empty() }
-
-    let isEmpty (l: HeterogeneousList<'a>) = typeof<'a> = typeof<Empty>
-
-    type private Pred<'a when 'a :> IFolderVisitable<'a>> = 'a
-
-    let private fold_core folder acc (l: HeterogeneousList<Pred<'pred>>) = l.Pred.Accept(folder, acc, l.Pred)
-
     [<RequireQualifiedAccess>]
     [<NoEquality; NoComparison; Struct>]
-    type Pair<'hd, 'pred when 'pred :> IFolderVisitable<'pred>> = private { Head: 'hd; Tail: HeterogeneousList<'pred> } with
+    type Pair<'hd, 'tl
+                when 'tl :> IPredecessorPremise<'tl> and 'tl :> IPredecessor and 'tl : struct> = 
+        internal { Head: 'hd; Tail: HeterogeneousList<'tl> } with
 
-        static member private Accept (folder: IFolder<'TState>, acc: 'TState, elem: Pair<'hd, 'pred>) = 
+        static member private Length = Predecessors.tailLength<'tl, Pair<'hd, 'tl>> + 1
+
+        static member private Accept (folder: IFolder<'state>, acc: 'state, elem: Pair<'hd, 'tl>) = 
             let newAcc = folder.Step<'hd>(acc, elem.Head)
-            elem.Tail |> fold_core folder newAcc
+            Predecessors.visitTail<'tl,Pair<'hd, 'tl>,'state> folder newAcc elem.Tail.Pred
 
-        interface IFolderVisitable<Pair<'hd, 'pred>> with
-            member _.Accept (folder, acc, elem) = Pair<'hd, 'pred>.Accept(folder, acc, elem)
+        interface IPredecessor
+
+        interface IConstructedPredecessorPremise<'tl, Pair<'hd, 'tl>> with
+            member _.Accept (folder, acc, elem) = Pair<'hd, 'tl>.Accept(folder, acc, elem)
+        
+            member x.Length = Pair<'hd, 'tl>.Length
 
     end
+
+
+    let empty: HeterogeneousList<Empty> = { Pred = Empty() }
+    let length (l: HeterogeneousList<'pred>) = Predecessors.length<'pred>
+
+    let isEmpty (l: HeterogeneousList<'a>) = (length l) = 0
+
 
     let private tryPredV (l: HeterogeneousList<_>) =
         if isEmpty l then
@@ -60,11 +89,7 @@ module HeterogeneousLists = begin
         let pred = { Pair.Head = hd; Pair.Tail = l; } in
         { HeterogeneousList.Pred = pred }
 
-    let fold folder seed l = fold_core folder seed l
-
-    let private folderForLength = { new IFolder<int> with member _.Step (acc: int, _: 'T): int = acc + 1 }
-
-    let length l = fold folderForLength 0 l
+    let fold folder (seed: 'state) (l: HeterogeneousList<'pred>) = Predecessors.accept folder seed l.Pred
 
 
 end
